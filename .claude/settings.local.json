@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(mkdir -p \"/Users/ashish/Desktop/Competitive vibing/.claude/rules\" \"/Users/ashish/Desktop/Competitive vibing/docs/prompts\")"
+    ],
+    "additionalDirectories": [
+      "/Users/ashish/Desktop/Competitive vibing/.claude"
+    ]
+  }
+}
