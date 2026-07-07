@@ -35,8 +35,12 @@ AlgoExplain is a mobile-first web app for coding interview practice. Users read 
 │       ├── auth/[...nextauth]/route.ts
 │       ├── problems/route.ts
 │       ├── problems/[slug]/route.ts
-│       ├── evaluate/route.ts   # Streaming Groq evaluation
-│       └── history/route.ts
+│       ├── evaluate/route.ts   # Streaming Groq evaluation (+ follow-up questions)
+│       ├── history/route.ts
+│       ├── history/[id]/route.ts
+│       ├── interview/answer/route.ts    # Socratic interviewer: record answer (no AI call)
+│       ├── interview/finalize/route.ts  # Socratic interviewer: streaming final assessment
+│       └── counterexample/route.ts      # Counterexample engine: generate → verify → stream
 ├── components/                 # Shared UI components
 ├── lib/
 │   ├── db.ts                   # Supabase client

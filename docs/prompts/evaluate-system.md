@@ -36,6 +36,8 @@ Scoring:
 For edge_cases.missed: list only genuine edge cases the user did NOT address and that are relevant to the problem. If all major edge cases are covered, return an empty array.
 
 For complexity: state the time and space complexity of the approach the user described (not necessarily the optimal complexity).
+
+For followup_questions: write 1–3 probing questions a real interviewer would ask next, ordered by importance. Each must be answerable in 1–3 sentences and must target a specific gap in THIS explanation — an unaddressed edge case, an unjustified complexity claim, or an ambiguous step. Probe the weakest-scoring dimension first. If the verdict is "correct", ask stress-test questions instead (scaling limits, adversarial inputs, what-if constraint changes). Never reveal the solution or the reference approach in a question.
 ```
 
 ---
@@ -133,14 +135,25 @@ For complexity: state the time and space complexity of the approach the user des
           "required": ["score"],
           "additionalProperties": false
         },
-        "commentary": { "type": "string" }
+        "commentary": { "type": "string" },
+        "followup_questions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": { "type": "string" }
+        }
       },
-      "required": ["verdict", "score", "correctness", "edge_cases", "complexity", "clarity", "commentary"],
+      "required": ["verdict", "score", "correctness", "edge_cases", "complexity", "clarity", "commentary", "followup_questions"],
       "additionalProperties": false
     }
   }
 }
 ```
+
+> `followup_questions` powers the Socratic AI Interviewer (see `interview-final.md`).
+> Generating the questions inside the evaluation call costs no extra latency or
+> tokens versus a separate "start interview" round trip, and the questions are
+> grounded in the same context that produced the verdict.
 
 ---
 
@@ -151,11 +164,14 @@ Because Groq streams tokens of a JSON string, we cannot parse individual dimensi
 1. Buffer the full JSON string as chunks arrive
 2. Once `{ "type": "done" }` is detected (or stream closes), parse the full JSON
 3. Emit the parsed fields as NDJSON chunks to the client in this order:
+   - `{ "type": "status", "value": "evaluating" }` (sent immediately, before the Groq call resolves)
    - `{ "type": "verdict", "value": "..." }`
    - `{ "type": "commentary", "value": "..." }`
-   - `{ "type": "edge_cases", "value": [...] }`
-   - `{ "type": "complexity", "value": { "time": "...", "space": "..." } }`
+   - `{ "type": "correctness", "value": { "explanation": "..." } }`
+   - `{ "type": "edge_cases", "value": { "missed": [...], "explanation": "..." } }`
+   - `{ "type": "complexity", "value": { "time": "...", "space": "...", "explanation": "..." } }`
    - `{ "type": "scores", "value": { "total": 72, "correctness": 28, ... } }`
+   - `{ "type": "followup_questions", "value": ["...", "..."] }`
    - `{ "type": "done", "evaluation_id": "uuid" }`
 
 This gives the client a structured progressive reveal even though the underlying AI response is a single JSON blob.
