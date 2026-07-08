@@ -4,7 +4,7 @@ import {
   type EvaluationRow,
   type ProblemRow,
 } from '@/lib/db';
-import { groqJson, GROQ_MODEL } from '@/lib/groq';
+import { groqJson, GroqUnavailableError, GROQ_MODEL } from '@/lib/groq';
 import {
   COUNTEREXAMPLE_GENERATE_JSON_SCHEMA,
   COUNTEREXAMPLE_GENERATE_SYSTEM_PROMPT,
@@ -21,6 +21,22 @@ import {
 } from '@/lib/schemas';
 
 const MAX_ATTEMPTS = 2;
+
+/**
+ * Constructing a valid counterexample is a genuine reasoning task, so it gets
+ * the strong reasoning model. Verification stays on the session default —
+ * a different model family checking the generator means they can't share
+ * blind spots. Falls back to the default model if the strong one is
+ * unavailable (e.g. not on the account's tier).
+ */
+const GENERATION_MODEL =
+  process.env.GROQ_COUNTEREXAMPLE_MODEL?.trim() || 'openai/gpt-oss-120b';
+
+/**
+ * Verifier: also a reasoning model, but a different one with its own separate
+ * per-model TPM budget on Groq, so the two calls never compete for tokens.
+ */
+const VERIFICATION_MODEL = process.env.GROQ_VERIFY_MODEL?.trim() || 'openai/gpt-oss-20b';
 
 export type CounterexampleOutcome =
   | { status: 'verified'; counterexample: Counterexample }
@@ -44,24 +60,48 @@ export async function generateVerifiedCounterexample(
 
   let previousIssues: string[] | undefined;
 
+  let generationModel = GENERATION_MODEL;
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     await onPhase?.('generating');
     let generation: CounterexampleGeneration;
     try {
-      const { data } = await groqJson<unknown>({
-        system: COUNTEREXAMPLE_GENERATE_SYSTEM_PROMPT,
-        user: buildCounterexampleGenerateUserMessage(
-          problem,
-          evaluation,
-          correctnessExplanation,
-          previousIssues
-        ),
-        schemaName: 'counterexample_generation',
-        schema: COUNTEREXAMPLE_GENERATE_JSON_SCHEMA,
-        temperature: 0,
-      });
+      const user = buildCounterexampleGenerateUserMessage(
+        problem,
+        evaluation,
+        correctnessExplanation,
+        previousIssues
+      );
+      let data: unknown;
+      try {
+        ({ data } = await groqJson<unknown>({
+          system: COUNTEREXAMPLE_GENERATE_SYSTEM_PROMPT,
+          user,
+          schemaName: 'counterexample_generation',
+          schema: COUNTEREXAMPLE_GENERATE_JSON_SCHEMA,
+          temperature: 0,
+          model: generationModel,
+          reasoningEffort: 'high',
+          maxTokens: 3000,
+        }));
+      } catch (err) {
+        if (err instanceof GroqUnavailableError && generationModel !== GROQ_MODEL) {
+          generationModel = GROQ_MODEL;
+          ({ data } = await groqJson<unknown>({
+            system: COUNTEREXAMPLE_GENERATE_SYSTEM_PROMPT,
+            user,
+            schemaName: 'counterexample_generation',
+            schema: COUNTEREXAMPLE_GENERATE_JSON_SCHEMA,
+            temperature: 0,
+            maxTokens: 3000,
+          }));
+        } else {
+          throw err;
+        }
+      }
       generation = counterexampleGenerationSchema.parse(data);
-    } catch {
+    } catch (err) {
+      if (err instanceof GroqUnavailableError) throw err;
       previousIssues = ['The previous response was not valid JSON for the schema.'];
       continue;
     }
@@ -80,18 +120,38 @@ export async function generateVerifiedCounterexample(
     }
 
     await onPhase?.('verifying');
-    const { data: verifyData } = await groqJson<unknown>({
-      system: COUNTEREXAMPLE_VERIFY_SYSTEM_PROMPT,
-      user: buildCounterexampleVerifyUserMessage(problem, evaluation.explanation, {
-        input: generation.input,
-        expected_output: generation.expected_output,
-        approach_output: generation.approach_output,
-        steps: generation.steps,
-      }),
-      schemaName: 'counterexample_verification',
-      schema: COUNTEREXAMPLE_VERIFY_JSON_SCHEMA,
-      temperature: 0,
+    const verifyUser = buildCounterexampleVerifyUserMessage(problem, evaluation.explanation, {
+      input: generation.input,
+      expected_output: generation.expected_output,
+      approach_output: generation.approach_output,
+      steps: generation.steps,
     });
+    let verifyData: unknown;
+    try {
+      ({ data: verifyData } = await groqJson<unknown>({
+        system: COUNTEREXAMPLE_VERIFY_SYSTEM_PROMPT,
+        user: verifyUser,
+        schemaName: 'counterexample_verification',
+        schema: COUNTEREXAMPLE_VERIFY_JSON_SCHEMA,
+        temperature: 0,
+        model: VERIFICATION_MODEL,
+        reasoningEffort: 'medium',
+        maxTokens: 2500,
+      }));
+    } catch (err) {
+      if (err instanceof GroqUnavailableError && VERIFICATION_MODEL !== GROQ_MODEL) {
+        ({ data: verifyData } = await groqJson<unknown>({
+          system: COUNTEREXAMPLE_VERIFY_SYSTEM_PROMPT,
+          user: verifyUser,
+          schemaName: 'counterexample_verification',
+          schema: COUNTEREXAMPLE_VERIFY_JSON_SCHEMA,
+          temperature: 0,
+          maxTokens: 2500,
+        }));
+      } else {
+        throw err;
+      }
+    }
 
     const verification = counterexampleVerificationSchema.parse(verifyData);
     if (verification.valid) {
@@ -105,7 +165,7 @@ export async function generateVerifiedCounterexample(
           why_it_breaks: generation.why_it_breaks,
           verified: true,
           attempts: attempt,
-          model: GROQ_MODEL,
+          model: generationModel,
         },
       };
     }

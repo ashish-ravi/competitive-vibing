@@ -8,7 +8,10 @@
 CREATE SCHEMA IF NOT EXISTS next_auth;
 
 GRANT USAGE ON SCHEMA next_auth TO service_role;
-GRANT ALL ON ALL TABLES IN SCHEMA next_auth TO service_role;
+-- Grant on future tables in this schema (the tables are created below —
+-- a plain GRANT ON ALL TABLES here would apply to nothing and the adapter
+-- would hit "permission denied" at first sign-in).
+ALTER DEFAULT PRIVILEGES IN SCHEMA next_auth GRANT ALL ON TABLES TO service_role;
 
 --
 -- next_auth.users
@@ -85,6 +88,10 @@ CREATE TABLE IF NOT EXISTS next_auth.verification_tokens (
   CONSTRAINT verification_tokens_pkey PRIMARY KEY (token),
   CONSTRAINT token_identifier_unique UNIQUE (token, identifier)
 );
+
+-- Now that the tables exist, grant explicitly as well (idempotent with the
+-- default-privileges rule above).
+GRANT ALL ON ALL TABLES IN SCHEMA next_auth TO service_role;
 
 --
 -- public.users — application-facing user table (spec: docs/architecture.md)

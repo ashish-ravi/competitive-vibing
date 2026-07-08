@@ -259,6 +259,7 @@ Absolute rules:
 - approach_output is what the described approach produces. It MUST differ from expected_output.
 - steps: trace the described approach on the input, one step per entry. "action" says what the approach does; "state" shows the relevant variables after that step. Keep each under 20 words.
 - why_it_breaks: 1–2 sentences tying the failure to the specific gap in the described approach.
+- Before answering, self-check: re-derive expected_output from the problem statement and re-derive approach_output from your own steps. If they are equal, your input is NOT a counterexample — pick a different input and redo the trace. Only answer once they provably differ.
 - Respond with a JSON object that strictly follows the provided schema. No text outside the JSON.`;
 
 export const COUNTEREXAMPLE_GENERATE_JSON_SCHEMA: Record<string, unknown> = {
@@ -322,16 +323,22 @@ ${correctnessExplanation}${retryBlock}`;
 // Counterexample verification (docs/prompts/counterexample-verify.md)
 // ---------------------------------------------------------------------------
 
-export const COUNTEREXAMPLE_VERIFY_SYSTEM_PROMPT = `You are an adversarial reviewer checking a proposed counterexample for a candidate's described algorithm approach. You did NOT produce the counterexample. Be skeptical; your default is to reject.
+export const COUNTEREXAMPLE_VERIFY_SYSTEM_PROMPT = `You are an independent reviewer checking a proposed counterexample for a candidate's described algorithm approach. You did NOT produce it. Your job is to catch factual errors — and only factual errors.
 
-Check, independently and in this order:
-1. Recompute the correct answer for the input using ONLY the problem statement. Does it equal expected_output? If not, invalid.
-2. Re-simulate the candidate's approach exactly as described on the input, step by step. Does it produce approach_output? If not, invalid.
-3. Confirm approach_output differs from expected_output. If they match, invalid.
-4. Confirm the input satisfies the problem's constraints. If not, invalid.
-5. Confirm each listed step follows from the candidate's description without inventing behavior. If a step assumes something the candidate never said, invalid.
+Field semantics (do not confuse them):
+- expected_output = the proposal's claim for the CORRECT answer on the input, per the problem statement.
+- approach_output = the proposal's claim for what the CANDIDATE'S DESCRIBED APPROACH yields on the input. Because the approach is flawed, approach_output is expected to differ from the correct answer — that is the whole point, not an error.
 
-Return JSON only: "valid" true/false, and "issues" listing every specific problem you found (empty array if valid). Each issue must be concrete, e.g. "expected_output should be 6, not 7: the subarray [3,-1,4] sums to 6".`;
+Check, by recomputing everything yourself:
+1. Derive the correct answer for the input using ONLY the problem statement. Reject only if it differs from expected_output.
+2. Simulate the candidate's approach exactly as described on the input. Reject only if your simulation's result differs from approach_output.
+3. Reject if approach_output equals expected_output (then it is not a counterexample).
+4. Reject if the input violates the problem's constraints.
+5. Reject if a step invents behavior the candidate never described. Reasonable, obvious readings of the description (e.g. "return the first element that equals its neighbor" means return that value and stop) are NOT inventions.
+
+Do NOT reject for style, step granularity, phrasing, or missing detail that does not change the outputs. If all recomputed values match the proposal, it is valid.
+
+Return JSON only: "valid" true/false, and "issues" listing each concrete, provable error with your recomputed value (empty array if valid). Example issue: "expected_output should be 6, not 7: the subarray [3,-1,4] sums to 6".`;
 
 export const COUNTEREXAMPLE_VERIFY_JSON_SCHEMA: Record<string, unknown> = {
   type: 'object',

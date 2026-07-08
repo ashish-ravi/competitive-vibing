@@ -23,8 +23,15 @@ Absolute rules:
 - approach_output is what the described approach produces. It MUST differ from expected_output.
 - steps: trace the described approach on the input, one step per entry. "action" says what the approach does; "state" shows the relevant variables after that step. Keep each under 20 words.
 - why_it_breaks: 1–2 sentences tying the failure to the specific gap in the described approach.
+- Before answering, self-check: re-derive expected_output from the problem statement and re-derive approach_output from your own steps. If they are equal, your input is NOT a counterexample — pick a different input and redo the trace. Only answer once they provably differ.
 - Respond with a JSON object that strictly follows the provided schema. No text outside the JSON.
 ```
+
+> Generation runs on the strong reasoning model `openai/gpt-oss-120b`
+> (`GROQ_COUNTEREXAMPLE_MODEL`, reasoning_effort high), falling back to
+> `GROQ_MODEL` if unavailable — constructing a valid counterexample is a
+> reasoning task and non-reasoning models produced wrong traces in testing.
+> Verification runs on a separate model (see `counterexample-verify.md`).
 
 ---
 
