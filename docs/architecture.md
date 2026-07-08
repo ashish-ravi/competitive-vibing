@@ -65,10 +65,10 @@ AlgoExplain is a Next.js monolith deployed on Vercel. There is no separate backe
 ### Groq API
 
 - OpenAI-compatible API (`/chat/completions`)
-- Model: `llama-3.3-70b-versatile` (default), `deepseek-r1-distill-llama-70b` (optional for harder problems)
-- `stream: true` always
-- `response_format: { type: "json_schema", json_schema: { ... } }` enforces structured output
-- Called only from `/api/evaluate` — never from client
+- Model: `meta-llama/llama-4-scout-17b-16e-instruct` (default, env-overridable via `GROQ_MODEL`). Must support `json_schema` structured outputs — `llama-3.3-70b-versatile` does not, and `gpt-oss-120b` does but has only 8k TPM on the free tier (too small for one full request); llama-4-scout has 30k TPM.
+- `response_format: { type: "json_schema", json_schema: { ... } }` enforces structured output. Because this yields a single JSON blob, the call is a normal (non-streamed) completion; the client-facing streaming is the route re-emitting parsed fields as NDJSON (see `docs/prompts/evaluate-system.md`).
+- Reasoning models (`gpt-oss-*`) additionally take a `reasoning_effort` knob; `lib/groq.ts` sets it automatically and skips it for non-reasoning models.
+- Called only from server routes (`/api/evaluate`, `/api/interview/finalize`, `/api/counterexample`) and the seed script — never from the client.
 
 ---
 

@@ -14,7 +14,7 @@ AlgoExplain is a mobile-first web app for coding interview practice. Users read 
 | UI | React + Tailwind CSS + shadcn/ui |
 | Auth | NextAuth.js v5 (Google OAuth) |
 | Database | Supabase (PostgreSQL + Row-Level Security) |
-| AI | Groq API — `llama-3.3-70b-versatile` |
+| AI | Groq API — `meta-llama/llama-4-scout-17b-16e-instruct` (env-overridable via `GROQ_MODEL`) |
 | Deployment | Vercel |
 | Language | TypeScript (strict mode) |
 
@@ -121,6 +121,6 @@ To use it: invoke the `21st_magic_component_builder` tool with a description of 
 2. **Streaming AI responses.** The evaluate endpoint must stream chunks, never batch.
 3. **No code execution.** The app evaluates natural language — it never runs user code. Do not add a code runner.
 4. **Auth required everywhere.** Every API route (except `/api/auth/*`) must verify the session and return 401 if missing.
-5. **Structured AI output.** The Groq call must use `response_format: { type: "json_schema" }`. Never parse free-form text.
+5. **Structured AI output.** The Groq call must use `response_format: { type: "json_schema" }`. Never parse free-form text. NOTE: the model must be one that supports `json_schema` structured outputs — `llama-3.3-70b-versatile` does **not** (only `json_object`), which is why the default is `llama-4-scout`. See https://console.groq.com/docs/structured-outputs#supported-models.
 6. **Rate limiting.** Evaluate endpoint enforces per-user limits (10 evaluations/hour). See `.claude/rules/security.md`.
 7. **No scope creep.** V1 scope is defined in `docs/prd.md`. Do not implement V2 features until V1 ships.

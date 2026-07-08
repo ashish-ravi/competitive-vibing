@@ -189,7 +189,7 @@ Return a JSON object matching this schema exactly.`,
     schemaName: 'problem_generation',
     schema: GENERATION_JSON_SCHEMA,
     temperature: 0.8,
-    maxTokens: 3000,
+    maxTokens: 4000,
   });
   return generatedProblemSchema.parse(data);
 }
@@ -225,11 +225,16 @@ async function main() {
   let inserted = 0;
   let skipped = 0;
 
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
   for (const [i, spec] of SEED_PLAN.entries()) {
     const label = `[${i + 1}/${SEED_PLAN.length}] ${spec.difficulty}/${spec.topic}`;
     let done = false;
 
     for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS && !done; attempt++) {
+      // Each problem is 2 calls (generate + verify); pace them so the free-tier
+      // 30k tokens/minute budget isn't exhausted in a burst.
+      if (i > 0 || attempt > 1) await sleep(2500);
       try {
         const problem = await generateProblem(spec.difficulty, spec.topic, existingSlugs);
 
