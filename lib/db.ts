@@ -22,6 +22,12 @@ export interface ExpectedApproach {
   critical_edge_cases: string[];
 }
 
+export interface ProblemSource {
+  canon: string;
+  canon_url: string;
+  note: string;
+}
+
 export interface ProblemRow {
   id: string;
   slug: string;
@@ -32,11 +38,19 @@ export interface ProblemRow {
   examples: ProblemExample[];
   constraints: string[];
   expected_approach: ExpectedApproach;
+  hints: string[];
+  source: ProblemSource | null;
   created_at: string;
 }
 
 /** Problem shape safe to send to the client — never includes expected_approach. */
 export type PublicProblem = Omit<ProblemRow, 'expected_approach'>;
+
+/** Lightweight shape for list/table views — no statement/hints payload. */
+export type ProblemListItem = Pick<
+  ProblemRow,
+  'id' | 'slug' | 'title' | 'difficulty' | 'topics' | 'created_at'
+>;
 
 export interface InterviewTurn {
   index: number;
@@ -94,9 +108,13 @@ export interface RateLimitRow {
 /**
  * Explicit column list for problem reads that go to the client.
  * expected_approach is intentionally absent — it is the grading key.
+ * (hints ARE client-visible: the UI reveals them progressively.)
  */
 export const PROBLEM_PUBLIC_COLUMNS =
-  'id, slug, title, difficulty, topics, statement, examples, constraints, created_at';
+  'id, slug, title, difficulty, topics, statement, examples, constraints, hints, source, created_at';
+
+/** Columns for list/table views — skips the heavy statement/hints payload. */
+export const PROBLEM_LIST_COLUMNS = 'id, slug, title, difficulty, topics, created_at';
 
 let serviceClient: SupabaseClient | null = null;
 

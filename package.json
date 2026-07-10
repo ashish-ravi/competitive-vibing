@@ -1,5 +1,5 @@
 {
-  "name": "algoexplain",
+  "name": "competitive-vibing",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx scripts/seed-problems.ts"
+    "seed": "tsx scripts/seed-problems.ts",
+    "import": "tsx scripts/import-problems.ts"
   },
   "dependencies": {
     "@auth/supabase-adapter": "^1.7.4",
+    "@radix-ui/react-dropdown-menu": "^2.1.20",
     "@supabase/supabase-js": "^2.45.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

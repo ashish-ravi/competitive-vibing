@@ -1,6 +1,8 @@
 import {
   getServiceDb,
+  PROBLEM_LIST_COLUMNS,
   PROBLEM_PUBLIC_COLUMNS,
+  type ProblemListItem,
   type ProblemRow,
   type PublicProblem,
 } from '@/lib/db';
@@ -10,12 +12,12 @@ export interface ProblemFilters {
   difficulty?: 'easy' | 'medium' | 'hard';
 }
 
-/** List problems for the client — never includes expected_approach. */
-export async function listProblems(filters: ProblemFilters = {}): Promise<PublicProblem[]> {
+/** List problems for browse/table views — light columns only. */
+export async function listProblems(filters: ProblemFilters = {}): Promise<ProblemListItem[]> {
   const db = getServiceDb();
   let query = db
     .from('problems')
-    .select(PROBLEM_PUBLIC_COLUMNS)
+    .select(PROBLEM_LIST_COLUMNS)
     .order('difficulty', { ascending: true })
     .order('title', { ascending: true });
 
@@ -24,7 +26,7 @@ export async function listProblems(filters: ProblemFilters = {}): Promise<Public
 
   const { data, error } = await query;
   if (error) throw new Error(`Failed to list problems: ${error.message}`);
-  return (data ?? []) as unknown as PublicProblem[];
+  return (data ?? []) as unknown as ProblemListItem[];
 }
 
 /** Fetch one problem for the client — never includes expected_approach. */
