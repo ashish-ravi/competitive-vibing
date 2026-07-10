@@ -48,9 +48,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh font-sans">
         <DotGrid />
         <SiteHeader />
-        <div className="mx-auto flex max-w-[1440px] px-4">
+        <div className="mx-auto flex max-w-[1440px]">
           <LeftSidebar />
-          <main className="min-w-0 flex-1 py-4 md:py-6 lg:pl-6">{children}</main>
+          <main className="min-w-0 flex-1 px-4 py-4 md:py-6 lg:pl-8">{children}</main>
         </div>
       </body>
     </html>

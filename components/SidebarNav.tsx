@@ -27,7 +27,7 @@ const ITEMS = [
   { href: '/leaderboard', label: 'Leaderboard', icon: LeaderboardIcon, isActive: (p: string) => p.startsWith('/leaderboard') },
 ];
 
-/** Vertical nav for the left rail. */
+/** Vertical nav: quiet pills, brand-tinted active state. */
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
@@ -43,20 +43,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'relative flex min-h-[44px] items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'flex min-h-[44px] items-center gap-3 rounded-lg px-3.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               active
-                ? 'bg-accent text-foreground'
-                : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground'
+                ? 'bg-primary/10 font-semibold text-primary'
+                : 'font-medium text-muted-foreground hover:bg-accent hover:text-foreground'
             )}
           >
-            <span
-              className={cn(
-                'absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary transition-opacity',
-                active ? 'opacity-100' : 'opacity-0'
-              )}
-              aria-hidden
-            />
-            <Icon className={cn('h-[18px] w-[18px]', active && 'text-primary')} />
+            <Icon className="h-[18px] w-[18px]" />
             {item.label}
           </Link>
         );

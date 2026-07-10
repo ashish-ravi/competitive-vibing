@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { signInAction } from '@/app/actions';
 import { AccountMenu } from '@/components/AccountMenu';
-import { HeaderShell } from '@/components/HeaderShell';
 import { LogoMark, Wordmark } from '@/components/Logo';
 import { MobileNav } from '@/components/MobileNav';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -12,7 +11,7 @@ export async function SiteHeader() {
   const session = await auth();
 
   return (
-    <HeaderShell>
+    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-2 px-4">
         <Link
           href="/"
@@ -48,6 +47,6 @@ export async function SiteHeader() {
           )}
         </div>
       </div>
-    </HeaderShell>
+    </header>
   );
 }

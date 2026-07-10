@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { MobileNav } from '@/components/MobileNav';
 import { ProgressRail } from '@/components/ProgressRail';
-import { SidebarNav } from '@/components/SidebarNav';
+import { SidebarPanel } from '@/components/LeftSidebar';
 import type { UserStats } from '@/lib/stats';
 
 /**
@@ -61,15 +61,7 @@ export default function DevPreviewPage({
 
   return (
     <div className="flex gap-6">
-      <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 shrink-0 py-4 lg:block">
-        <div className="flex h-full flex-col rounded-lg border bg-card p-3 shadow-sm">
-          <p className="px-3 pb-2 pt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            menu
-          </p>
-          <SidebarNav />
-          <p className="mt-auto px-3 pb-1 font-mono text-[11px] text-muted-foreground/60">cv · v3</p>
-        </div>
-      </aside>
+      <SidebarPanel />
       <div className="min-w-0 flex-1 space-y-4 py-4">
         <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
           day 4 of the streak, Ashish
