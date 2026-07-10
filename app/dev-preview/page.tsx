@@ -117,6 +117,9 @@ export default function DevPreviewPage({
       <ProgressRail
         stats={fakeStats}
         currentUserId="me"
+        solvedDays={[0, 1, 2, 4, 7, 9, 12].map((d) =>
+          new Date(Date.now() - d * 86_400_000).toISOString().slice(0, 10)
+        )}
         leaderboard={[
           { userId: 'a', name: 'Priya N', avatarUrl: null, xp: 1240, solved: 41, rank: 1 },
           { userId: 'me', name: 'Ashish Ravikumar', avatarUrl: null, xp: 980, solved: 33, rank: 2 },

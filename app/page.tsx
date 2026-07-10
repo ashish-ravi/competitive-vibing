@@ -6,6 +6,7 @@ import {
   getLeaderboard,
   getProblemStatuses,
   getResumeItems,
+  getSolveDays,
   getUserStats,
   topicLabel,
 } from '@/lib/stats';
@@ -78,12 +79,13 @@ export default async function HomePage({
     );
   }
 
-  const [problems, statuses, stats, resumeItems, leaderboard] = await Promise.all([
+  const [problems, statuses, stats, resumeItems, leaderboard, solvedDays] = await Promise.all([
     listProblems(),
     getProblemStatuses(session.user.id),
     getUserStats(session.user.id),
     getResumeItems(session.user.id),
     getLeaderboard(5),
+    getSolveDays(session.user.id),
   ]);
 
   const firstName = session.user.name?.split(' ')[0] ?? 'you';
@@ -135,7 +137,12 @@ export default async function HomePage({
         )}
         <ProblemBrowser problems={problems} statuses={statuses} />
       </div>
-      <ProgressRail stats={stats} leaderboard={leaderboard} currentUserId={session.user.id} />
+      <ProgressRail
+        stats={stats}
+        leaderboard={leaderboard}
+        currentUserId={session.user.id}
+        solvedDays={solvedDays}
+      />
     </div>
   );
 }

@@ -310,6 +310,19 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   };
 }
 
+/**
+ * Days (UTC, YYYY-MM-DD) on which the user SOLVED at least one problem —
+ * a correct verdict that day; attempts alone don't count.
+ */
+export async function getSolveDays(userId: string): Promise<string[]> {
+  const facts = await fetchEvalFacts(userId);
+  const days = new Set<string>();
+  for (const f of facts) {
+    if ((f.final_verdict ?? f.verdict) === 'correct') days.add(utcDay(f.created_at));
+  }
+  return [...days];
+}
+
 // ---------------------------------------------------------------------------
 // Continue / next-problem flow
 // ---------------------------------------------------------------------------

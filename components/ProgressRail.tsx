@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ActivityCalendar } from '@/components/ActivityCalendar';
 import { UserAvatar } from '@/components/UserAvatar';
 import { cn } from '@/lib/utils';
 import type { LeaderboardRow, UserStats } from '@/lib/stats';
@@ -16,10 +17,12 @@ export function ProgressRail({
   stats,
   leaderboard = [],
   currentUserId,
+  solvedDays = [],
 }: {
   stats: UserStats;
   leaderboard?: LeaderboardRow[];
   currentUserId?: string;
+  solvedDays?: string[];
 }) {
   return (
     <aside className="hidden w-72 shrink-0 xl:block">
@@ -52,6 +55,9 @@ export function ProgressRail({
               </p>
               <p className="mt-1 text-[11px] text-muted-foreground">solved</p>
             </div>
+          </div>
+          <div className="mt-3 border-t pt-3">
+            <ActivityCalendar solvedDays={solvedDays} />
           </div>
         </div>
 
