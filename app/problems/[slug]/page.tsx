@@ -5,6 +5,7 @@ import { countAttempts } from '@/lib/history';
 import { slugSchema } from '@/lib/schemas';
 import { ProblemStatement } from '@/components/ProblemStatement';
 import { EvaluationSection } from '@/components/EvaluationSection';
+import { HintsPanel } from '@/components/HintsPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,8 +23,15 @@ export default async function ProblemDetailPage({ params }: { params: { slug: st
 
   return (
     <div className="grid grid-cols-1 gap-6 pb-24 md:grid-cols-2 md:gap-8 md:pb-8">
-      <ProblemStatement problem={problem} />
-      <EvaluationSection problemId={problem.id} priorAttempts={attempts} />
+      <div className="space-y-4">
+        <ProblemStatement problem={problem} />
+        <HintsPanel hints={problem.hints ?? []} />
+      </div>
+      <EvaluationSection
+        problemId={problem.id}
+        problemSlug={problem.slug}
+        priorAttempts={attempts}
+      />
     </div>
   );
 }

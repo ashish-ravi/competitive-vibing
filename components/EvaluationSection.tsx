@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { ApproachReveal } from '@/components/ApproachReveal';
 import { CounterexampleCard } from '@/components/CounterexampleCard';
 import { EvaluationResult, type PartialEvaluation } from '@/components/EvaluationResult';
 import { ExplanationInput } from '@/components/ExplanationInput';
@@ -11,12 +12,13 @@ import { readNdjsonStream } from '@/lib/stream';
 
 interface EvaluationSectionProps {
   problemId: string;
+  problemSlug: string;
   priorAttempts: number;
 }
 
 type Phase = 'idle' | 'streaming' | 'complete' | 'error';
 
-export function EvaluationSection({ problemId, priorAttempts }: EvaluationSectionProps) {
+export function EvaluationSection({ problemId, problemSlug, priorAttempts }: EvaluationSectionProps) {
   const [explanation, setExplanation] = useState('');
   const [phase, setPhase] = useState<Phase>('idle');
   const [evaluation, setEvaluation] = useState<PartialEvaluation>({});
@@ -186,7 +188,8 @@ export function EvaluationSection({ problemId, priorAttempts }: EvaluationSectio
       )}
 
       {phase === 'complete' && (
-        <div className="flex justify-end">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <ApproachReveal slug={problemSlug} />
           <Button variant="ghost" size="sm" onClick={reset}>
             Start a fresh attempt
           </Button>
