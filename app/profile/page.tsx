@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { getLeaderboardOptIn, getUserStats } from '@/lib/stats';
 import { LeaderboardToggle } from '@/components/LeaderboardToggle';
+import { Reveal } from '@/components/Reveal';
 import { UserAvatar } from '@/components/UserAvatar';
 import { VerdictBadge } from '@/components/VerdictBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +31,7 @@ export default async function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-10">
       {/* Identity + level */}
-      <section className="grid-fade flex flex-wrap items-center gap-4 rounded-lg border bg-card p-5">
+      <section className="flex flex-wrap items-center gap-4 rounded-lg border bg-card p-5">
         <UserAvatar name={session.user.name} image={session.user.image} size={64} />
         <div className="min-w-0 flex-1">
           <h1 className="truncate font-display text-xl font-bold tracking-tight">
@@ -78,6 +79,7 @@ export default async function ProfilePage() {
       </section>
 
       {/* Difficulty progress */}
+      <Reveal>
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="prompt-heading font-display text-base">progress</CardTitle>
@@ -129,8 +131,10 @@ export default async function ProfilePage() {
           </div>
         </CardContent>
       </Card>
+      </Reveal>
 
       {/* Badges */}
+      <Reveal>
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="prompt-heading font-display text-base">
@@ -156,8 +160,10 @@ export default async function ProfilePage() {
           ))}
         </CardContent>
       </Card>
+      </Reveal>
 
       {/* Recent */}
+      <Reveal>
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="prompt-heading font-display text-base">recent</CardTitle>
@@ -193,6 +199,7 @@ export default async function ProfilePage() {
           ))}
         </CardContent>
       </Card>
+      </Reveal>
     </div>
   );
 }

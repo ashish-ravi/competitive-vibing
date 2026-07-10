@@ -4,6 +4,7 @@ import { listProblems } from '@/lib/problems';
 import { getProblemStatuses, getUserStats } from '@/lib/stats';
 import { HeroTerminal } from '@/components/HeroTerminal';
 import { ProblemBrowser } from '@/components/ProblemBrowser';
+import { Reveal } from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ export default async function HomePage() {
   if (!session?.user) {
     return (
       <div className="space-y-16 pb-16 pt-4 md:pt-10">
-        <section className="grid-fade grid items-center gap-10 md:grid-cols-2">
+        <section className="grid items-center gap-10 md:grid-cols-2">
           <div className="space-y-6">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
               interview prep for the thinking part
@@ -52,14 +53,12 @@ export default async function HomePage() {
 
         <section className="grid gap-4 md:grid-cols-3">
           {STEPS.map((step, i) => (
-            <div
-              key={step.title}
-              className="animate-fade-up rounded-lg border bg-card p-5"
-              style={{ animationDelay: `${i * 120}ms` }}
-            >
-              <h2 className="prompt-heading font-display text-base font-bold">{step.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
-            </div>
+            <Reveal key={step.title} delay={i * 120}>
+              <div className="h-full rounded-lg border bg-card p-5">
+                <h2 className="prompt-heading font-display text-base font-bold">{step.title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+              </div>
+            </Reveal>
           ))}
         </section>
       </div>
@@ -76,7 +75,7 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-5">
-      <div className="grid-fade flex flex-wrap items-end justify-between gap-3 pb-2">
+      <div className="flex flex-wrap items-end justify-between gap-3 pb-2">
         <div>
           <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
             {stats.streak > 0 ? `day ${stats.streak} of the streak, ${firstName}` : `pick a fight, ${firstName}`}

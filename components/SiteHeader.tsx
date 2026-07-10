@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { signInAction } from '@/app/actions';
 import { AccountMenu } from '@/components/AccountMenu';
+import { HeaderShell } from '@/components/HeaderShell';
 import { LogoMark, Wordmark } from '@/components/Logo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -11,7 +12,7 @@ export async function SiteHeader() {
   const session = await auth();
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
+    <HeaderShell>
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4">
         <Link
           href="/"
@@ -23,12 +24,26 @@ export async function SiteHeader() {
 
         <nav className="flex items-center gap-1.5">
           {session?.user && (
-            <Link
-              href="/"
-              className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'hidden sm:inline-flex')}
-            >
-              Problems
-            </Link>
+            <>
+              <Link
+                href="/"
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'hidden sm:inline-flex'
+                )}
+              >
+                Problems
+              </Link>
+              <Link
+                href="/leaderboard"
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'hidden sm:inline-flex'
+                )}
+              >
+                Leaderboard
+              </Link>
+            </>
           )}
           <ThemeToggle />
           {session?.user ? (
@@ -46,6 +61,6 @@ export async function SiteHeader() {
           )}
         </nav>
       </div>
-    </header>
+    </HeaderShell>
   );
 }
