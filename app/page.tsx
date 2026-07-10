@@ -4,6 +4,7 @@ import { listProblems } from '@/lib/problems';
 import { getProblemStatuses, getResumeItems, getUserStats } from '@/lib/stats';
 import { HeroTerminal } from '@/components/HeroTerminal';
 import { ProblemBrowser } from '@/components/ProblemBrowser';
+import { ProgressRail } from '@/components/ProgressRail';
 import { ResumeSection } from '@/components/ResumeSection';
 import { Reveal } from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
@@ -76,20 +77,23 @@ export default async function HomePage() {
   const firstName = session.user.name?.split(' ')[0] ?? 'you';
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3 pb-2">
-        <div>
-          <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
-            {stats.streak > 0 ? `day ${stats.streak} of the streak, ${firstName}` : `pick a fight, ${firstName}`}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {stats.solvedCount} solved · level {stats.level} ·{' '}
-            <span className="font-mono">{stats.xp} xp</span>
-          </p>
+    <div className="flex gap-6">
+      <div className="min-w-0 flex-1 space-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-3 pb-2">
+          <div>
+            <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
+              {stats.streak > 0 ? `day ${stats.streak} of the streak, ${firstName}` : `pick a fight, ${firstName}`}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground xl:hidden">
+              {stats.solvedCount} solved · level {stats.level} ·{' '}
+              <span className="font-mono">{stats.xp} xp</span>
+            </p>
+          </div>
         </div>
+        <ResumeSection items={resumeItems} />
+        <ProblemBrowser problems={problems} statuses={statuses} />
       </div>
-      <ResumeSection items={resumeItems} />
-      <ProblemBrowser problems={problems} statuses={statuses} />
+      <ProgressRail stats={stats} />
     </div>
   );
 }

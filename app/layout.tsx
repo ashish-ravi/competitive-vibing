@@ -3,6 +3,7 @@ import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { ThemeScript } from '@/components/ThemeScript';
 import { SiteHeader } from '@/components/SiteHeader';
+import { LeftSidebar } from '@/components/LeftSidebar';
 import { DotGrid } from '@/components/DotGrid';
 
 const sans = IBM_Plex_Sans({
@@ -47,7 +48,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh font-sans">
         <DotGrid />
         <SiteHeader />
-        <main className="mx-auto max-w-6xl px-4 py-4 md:py-6">{children}</main>
+        <div className="mx-auto flex max-w-[1440px] px-4">
+          <LeftSidebar />
+          <main className="min-w-0 flex-1 py-4 md:py-6 lg:pl-6">{children}</main>
+        </div>
       </body>
     </html>
   );
