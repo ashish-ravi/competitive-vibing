@@ -22,8 +22,18 @@ export function LeaderboardIcon({ className }: { className?: string }) {
   );
 }
 
+export function ExploreIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m15.5 8.5-2 5-5 2 2-5z" />
+    </svg>
+  );
+}
+
 const ITEMS = [
   { href: '/', label: 'Library', icon: LibraryIcon, isActive: (p: string) => p === '/' || p.startsWith('/problems') },
+  { href: '/explore', label: 'Explore', icon: ExploreIcon, isActive: (p: string) => p.startsWith('/explore') },
   { href: '/leaderboard', label: 'Leaderboard', icon: LeaderboardIcon, isActive: (p: string) => p.startsWith('/leaderboard') },
 ];
 

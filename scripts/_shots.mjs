@@ -10,6 +10,9 @@ const shots = [
   { name: 'landing-mobile', url: `${BASE}/`, width: 390, height: 844 },
   { name: 'drawer-mobile-dark', url: `${BASE}/dev-preview?view=drawer`, width: 390, height: 844, dark: true },
   { name: 'shell-desktop-dark', url: `${BASE}/dev-preview`, width: 1440, height: 900, dark: true },
+  { name: 'roadmap-desktop', url: `${BASE}/dev-preview?view=roadmap`, width: 1280, height: 1400 },
+  { name: 'roadmap-desktop-dark', url: `${BASE}/dev-preview?view=roadmap`, width: 1280, height: 1400, dark: true },
+  { name: 'roadmap-mobile-dark', url: `${BASE}/dev-preview?view=roadmap`, width: 390, height: 1200, dark: true },
 ];
 
 const browser = await chromium.launch();

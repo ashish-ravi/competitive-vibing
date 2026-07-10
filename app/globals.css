@@ -97,7 +97,8 @@
     .animate-pulse-cursor,
     .animate-caret,
     .animate-slide-in,
-    .animate-backdrop-in {
+    .animate-backdrop-in,
+    .animate-ping {
       animation: none !important;
     }
   }

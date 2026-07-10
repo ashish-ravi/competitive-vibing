@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import { MobileNav } from '@/components/MobileNav';
 import { ProgressRail } from '@/components/ProgressRail';
+import { Roadmap } from '@/components/Roadmap';
 import { SidebarPanel } from '@/components/LeftSidebar';
+import { buildRoadmap } from '@/lib/roadmap';
 import type { UserStats } from '@/lib/stats';
 
 /**
@@ -40,6 +42,41 @@ export default function DevPreviewPage({
     ],
     recent: [],
   };
+
+  if (searchParams.view === 'roadmap') {
+    const topics = [
+      { topic: 'arrays-hashing', label: 'Arrays & Hashing', solved: 9, total: 9 },
+      { topic: 'two-pointers', label: 'Two Pointers', solved: 5, total: 5 },
+      { topic: 'stack', label: 'Stack', solved: 4, total: 7 },
+      { topic: 'sliding-window', label: 'Sliding Window', solved: 2, total: 6 },
+      { topic: 'binary-search', label: 'Binary Search', solved: 0, total: 7 },
+      { topic: 'linked-list', label: 'Linked List', solved: 1, total: 11 },
+      { topic: 'trees', label: 'Trees', solved: 0, total: 15 },
+      { topic: 'tries', label: 'Tries', solved: 0, total: 3 },
+      { topic: 'heap', label: 'Heap / Priority Queue', solved: 0, total: 7 },
+      { topic: 'backtracking', label: 'Backtracking', solved: 0, total: 9 },
+      { topic: 'graphs', label: 'Graphs', solved: 0, total: 13 },
+      { topic: 'dp-1d', label: 'Dynamic Programming I', solved: 0, total: 12 },
+      { topic: 'intervals', label: 'Intervals', solved: 0, total: 6 },
+      { topic: 'greedy', label: 'Greedy', solved: 0, total: 8 },
+      { topic: 'advanced-graphs', label: 'Advanced Graphs', solved: 0, total: 6 },
+      { topic: 'dp-2d', label: 'Dynamic Programming II', solved: 0, total: 11 },
+      { topic: 'bit-manipulation', label: 'Bit Manipulation', solved: 0, total: 7 },
+      { topic: 'math-geometry', label: 'Math & Geometry', solved: 0, total: 8 },
+    ];
+    const { stages, currentLevel } = buildRoadmap(topics);
+    return (
+      <div className="mx-auto max-w-3xl space-y-8 py-4">
+        <div>
+          <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">explore</h1>
+          <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+            The path from zero to interview-ready. Start at the top, clear a stage, move down.
+          </p>
+        </div>
+        <Roadmap stages={stages} currentLevel={currentLevel} />
+      </div>
+    );
+  }
 
   if (searchParams.view === 'drawer') {
     return (
