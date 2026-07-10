@@ -85,8 +85,17 @@
     font-weight: 600;
   }
 
-  /* Subtle dotted grid backdrop for hero/dashboard headers. */
+  /* Subtle dotted grid backdrop for hero/dashboard headers.
+     The dots + fade live on a pseudo-element BEHIND the content — the mask
+     must never apply to the text itself. */
   .grid-fade {
+    position: relative;
+  }
+  .grid-fade::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
     background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
     background-size: 22px 22px;
     mask-image: linear-gradient(to bottom, black 0%, transparent 85%);
