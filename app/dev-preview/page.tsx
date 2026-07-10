@@ -114,7 +114,17 @@ export default function DevPreviewPage({
           ))}
         </div>
       </div>
-      <ProgressRail stats={fakeStats} />
+      <ProgressRail
+        stats={fakeStats}
+        currentUserId="me"
+        leaderboard={[
+          { userId: 'a', name: 'Priya N', avatarUrl: null, xp: 1240, solved: 41, rank: 1 },
+          { userId: 'me', name: 'Ashish Ravikumar', avatarUrl: null, xp: 980, solved: 33, rank: 2 },
+          { userId: 'c', name: 'Dev K', avatarUrl: null, xp: 710, solved: 25, rank: 3 },
+          { userId: 'd', name: 'Sam T', avatarUrl: null, xp: 430, solved: 14, rank: 4 },
+          { userId: 'e', name: 'Lin W', avatarUrl: null, xp: 180, solved: 7, rank: 5 },
+        ]}
+      />
     </div>
   );
 }

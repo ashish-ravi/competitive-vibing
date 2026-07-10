@@ -78,28 +78,26 @@ export function ProblemBrowser({ problems, statuses }: ProblemBrowserProps) {
   }, [scoped, statuses]);
 
   const searching = search.trim().length > 0;
+  // Inside a topic, everything (tabs, search, counts) scopes to that topic.
+  const inTopic = useMemo(
+    () => (topic ? scoped.filter((p) => p.topics.includes(topic)) : scoped),
+    [scoped, topic]
+  );
   const tableRows = useMemo(() => {
-    let rows = scoped;
-    if (topic && !searching) rows = rows.filter((p) => p.topics.includes(topic));
-    if (searching) {
-      const q = search.trim().toLowerCase();
-      rows = rows.filter((p) => p.title.toLowerCase().includes(q));
-    }
-    return rows;
-  }, [scoped, topic, search, searching]);
+    if (!searching) return inTopic;
+    const q = search.trim().toLowerCase();
+    return inTopic.filter((p) => p.title.toLowerCase().includes(q));
+  }, [inTopic, search, searching]);
 
   const showTable = searching || topic !== null;
-  const solvedInScope = scoped.filter((p) => statuses[p.id]?.status === 'solved').length;
+  const solvedInScope = inTopic.filter((p) => statuses[p.id]?.status === 'solved').length;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <DifficultyTabs
-          value={difficulty}
-          onChange={(d) => setParams({ difficulty: d, topic: null })}
-        />
+        <DifficultyTabs value={difficulty} onChange={(d) => setParams({ difficulty: d })} />
         <p className="font-mono text-xs text-muted-foreground">
-          {solvedInScope}/{scoped.length} solved
+          {solvedInScope}/{inTopic.length} solved
         </p>
       </div>
 
@@ -146,24 +144,19 @@ export function ProblemBrowser({ problems, statuses }: ProblemBrowserProps) {
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg border bg-card">
-          <div className="flex items-center justify-between border-b px-4 py-2.5">
+          <div className="border-b px-4 py-2.5">
             <p className="font-mono text-xs text-muted-foreground">
               {searching ? (
-                <>“{search.trim()}” · {tableRows.length} match{tableRows.length === 1 ? '' : 'es'}</>
+                <>
+                  {topic && <>#{topic} · </>}“{search.trim()}” · {tableRows.length} match
+                  {tableRows.length === 1 ? '' : 'es'}
+                </>
               ) : (
                 <>
                   #{topic} · {tableRows.length} problem{tableRows.length === 1 ? '' : 's'}
                 </>
               )}
             </p>
-            {topic && !searching && (
-              <button
-                onClick={() => setParams({ topic: null })}
-                className="font-mono text-xs text-primary underline-offset-4 hover:underline"
-              >
-                ← all topics
-              </button>
-            )}
           </div>
           <ul className="divide-y">
             {tableRows.map((p) => {

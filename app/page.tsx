@@ -1,7 +1,14 @@
+import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { signInAction } from '@/app/actions';
 import { listProblems } from '@/lib/problems';
-import { getProblemStatuses, getResumeItems, getUserStats } from '@/lib/stats';
+import {
+  getLeaderboard,
+  getProblemStatuses,
+  getResumeItems,
+  getUserStats,
+  topicLabel,
+} from '@/lib/stats';
 import { HeroTerminal } from '@/components/HeroTerminal';
 import { ProblemBrowser } from '@/components/ProblemBrowser';
 import { ProgressRail } from '@/components/ProgressRail';
@@ -26,7 +33,11 @@ const STEPS = [
   },
 ];
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: { topic?: string; difficulty?: string };
+}) {
   const session = await auth();
 
   if (!session?.user) {
@@ -67,33 +78,59 @@ export default async function HomePage() {
     );
   }
 
-  const [problems, statuses, stats, resumeItems] = await Promise.all([
+  const [problems, statuses, stats, resumeItems, leaderboard] = await Promise.all([
     listProblems(),
     getProblemStatuses(session.user.id),
     getUserStats(session.user.id),
     getResumeItems(session.user.id),
+    getLeaderboard(5),
   ]);
 
   const firstName = session.user.name?.split(' ')[0] ?? 'you';
+  const topic = searchParams.topic;
+  const topicProgress = topic ? stats.topics.find((t) => t.topic === topic) : undefined;
 
   return (
     <div className="flex gap-6">
       <div className="min-w-0 flex-1 space-y-5">
-        <div className="flex flex-wrap items-end justify-between gap-3 pb-2">
-          <div>
-            <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
-              {stats.streak > 0 ? `day ${stats.streak} of the streak, ${firstName}` : `pick a fight, ${firstName}`}
+        {topic ? (
+          // Topic page: focused header, no greeting/resume noise.
+          <div className="pb-1">
+            <Link
+              href="/"
+              className="font-mono text-xs text-primary underline-offset-4 hover:underline"
+            >
+              ← all topics
+            </Link>
+            <h1 className="prompt-heading mt-2 font-display text-2xl font-bold tracking-tight">
+              {topicLabel(topic)}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground xl:hidden">
-              {stats.solvedCount} solved · level {stats.level} ·{' '}
-              <span className="font-mono">{stats.xp} xp</span>
-            </p>
+            {topicProgress && (
+              <p className="mt-1 font-mono text-xs text-muted-foreground">
+                {topicProgress.solved}/{topicProgress.total} solved
+                {topicProgress.attempted > 0 && <> · {topicProgress.attempted} in progress</>}
+              </p>
+            )}
           </div>
-        </div>
-        <ResumeSection items={resumeItems} />
+        ) : (
+          <>
+            <div className="flex flex-wrap items-end justify-between gap-3 pb-2">
+              <div>
+                <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
+                  {stats.streak > 0 ? `day ${stats.streak} of the streak, ${firstName}` : `pick a fight, ${firstName}`}
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground xl:hidden">
+                  {stats.solvedCount} solved · level {stats.level} ·{' '}
+                  <span className="font-mono">{stats.xp} xp</span>
+                </p>
+              </div>
+            </div>
+            <ResumeSection items={resumeItems} />
+          </>
+        )}
         <ProblemBrowser problems={problems} statuses={statuses} />
       </div>
-      <ProgressRail stats={stats} />
+      <ProgressRail stats={stats} leaderboard={leaderboard} currentUserId={session.user.id} />
     </div>
   );
 }

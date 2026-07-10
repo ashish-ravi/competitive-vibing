@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import { UserAvatar } from '@/components/UserAvatar';
 import { cn } from '@/lib/utils';
-import type { UserStats } from '@/lib/stats';
+import type { LeaderboardRow, UserStats } from '@/lib/stats';
 
 const DIFFICULTY_BAR: Record<string, string> = {
   easy: 'bg-ease',
@@ -8,8 +9,18 @@ const DIFFICULTY_BAR: Record<string, string> = {
   hard: 'bg-boss',
 };
 
+const MEDALS = ['🥇', '🥈', '🥉'];
+
 /** Compact progress panel for the desktop right rail (library page). */
-export function ProgressRail({ stats }: { stats: UserStats }) {
+export function ProgressRail({
+  stats,
+  leaderboard = [],
+  currentUserId,
+}: {
+  stats: UserStats;
+  leaderboard?: LeaderboardRow[];
+  currentUserId?: string;
+}) {
   return (
     <aside className="hidden w-72 shrink-0 xl:block">
       <div className="sticky top-[4.5rem] space-y-3">
@@ -88,6 +99,48 @@ export function ProgressRail({ stats }: { stats: UserStats }) {
               </span>
             ))}
           </div>
+        </div>
+
+        <div className="rounded-lg border bg-card p-4">
+          <p className="prompt-heading font-display text-sm font-bold lowercase">leaderboard</p>
+          {leaderboard.length === 0 ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Nobody&apos;s on the board yet — be the first to claim rank #1.
+            </p>
+          ) : (
+            <ul className="mt-2 space-y-1">
+              {leaderboard.map((row) => {
+                const isYou = row.userId === currentUserId;
+                return (
+                  <li
+                    key={row.userId}
+                    className={cn(
+                      'flex items-center gap-2 rounded-md px-1.5 py-1',
+                      isYou && 'bg-primary/5'
+                    )}
+                  >
+                    <span className="w-5 text-center font-mono text-[11px] tabular-nums text-muted-foreground">
+                      {MEDALS[row.rank - 1] ?? row.rank}
+                    </span>
+                    <UserAvatar name={row.name} image={row.avatarUrl} size={20} />
+                    <span className="min-w-0 flex-1 truncate text-xs font-medium">
+                      {row.name}
+                      {isYou && <span className="ml-1 text-primary">(you)</span>}
+                    </span>
+                    <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                      {row.xp}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <Link
+            href="/leaderboard"
+            className="mt-3 inline-block font-mono text-xs text-primary underline-offset-4 hover:underline"
+          >
+            full leaderboard →
+          </Link>
         </div>
       </div>
     </aside>
