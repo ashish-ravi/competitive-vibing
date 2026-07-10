@@ -1,16 +1,16 @@
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
-export function LogoMark({ className }: { className?: string }) {
+export function LogoMark({ className, size = 32 }: { className?: string; size?: number }) {
   return (
-    <span
-      className={cn(
-        'flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-primary to-glow font-mono text-sm font-semibold text-white',
-        className
-      )}
-      aria-hidden
-    >
-      cv
-    </span>
+    <Image
+      src="/logo.png"
+      alt=""
+      width={size}
+      height={size}
+      priority
+      className={cn('shrink-0 rounded-md', className)}
+    />
   );
 }
 
