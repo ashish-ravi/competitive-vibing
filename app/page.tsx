@@ -1,9 +1,10 @@
 import { auth } from '@/lib/auth';
 import { signInAction } from '@/app/actions';
 import { listProblems } from '@/lib/problems';
-import { getProblemStatuses, getUserStats } from '@/lib/stats';
+import { getProblemStatuses, getResumeItems, getUserStats } from '@/lib/stats';
 import { HeroTerminal } from '@/components/HeroTerminal';
 import { ProblemBrowser } from '@/components/ProblemBrowser';
+import { ResumeSection } from '@/components/ResumeSection';
 import { Reveal } from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 
@@ -65,10 +66,11 @@ export default async function HomePage() {
     );
   }
 
-  const [problems, statuses, stats] = await Promise.all([
+  const [problems, statuses, stats, resumeItems] = await Promise.all([
     listProblems(),
     getProblemStatuses(session.user.id),
     getUserStats(session.user.id),
+    getResumeItems(session.user.id),
   ]);
 
   const firstName = session.user.name?.split(' ')[0] ?? 'you';
@@ -86,6 +88,7 @@ export default async function HomePage() {
           </p>
         </div>
       </div>
+      <ResumeSection items={resumeItems} />
       <ProblemBrowser problems={problems} statuses={statuses} />
     </div>
   );

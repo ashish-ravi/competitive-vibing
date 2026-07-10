@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { ApproachReveal } from '@/components/ApproachReveal';
 import { CounterexampleCard } from '@/components/CounterexampleCard';
 import { EvaluationResult, type PartialEvaluation } from '@/components/EvaluationResult';
@@ -9,16 +10,23 @@ import { ExplanationInput } from '@/components/ExplanationInput';
 import { InterviewPanel } from '@/components/InterviewPanel';
 import { RateLimitNotice } from '@/components/RateLimitNotice';
 import { readNdjsonStream } from '@/lib/stream';
+import { cn } from '@/lib/utils';
 
 interface EvaluationSectionProps {
   problemId: string;
   problemSlug: string;
   priorAttempts: number;
+  nextProblem: { slug: string; title: string } | null;
 }
 
 type Phase = 'idle' | 'streaming' | 'complete' | 'error';
 
-export function EvaluationSection({ problemId, problemSlug, priorAttempts }: EvaluationSectionProps) {
+export function EvaluationSection({
+  problemId,
+  problemSlug,
+  priorAttempts,
+  nextProblem,
+}: EvaluationSectionProps) {
   const [explanation, setExplanation] = useState('');
   const [phase, setPhase] = useState<Phase>('idle');
   const [evaluation, setEvaluation] = useState<PartialEvaluation>({});
@@ -188,12 +196,32 @@ export function EvaluationSection({ problemId, problemSlug, priorAttempts }: Eva
       )}
 
       {phase === 'complete' && (
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <ApproachReveal slug={problemSlug} />
-          <Button variant="ghost" size="sm" onClick={reset}>
-            Start a fresh attempt
-          </Button>
-        </div>
+        <>
+          {nextProblem && (
+            <Link
+              href={`/problems/${nextProblem.slug}`}
+              className={cn(
+                buttonVariants({
+                  variant: evaluation.verdict === 'correct' ? 'default' : 'outline',
+                  size: 'lg',
+                }),
+                'w-full justify-between md:w-auto md:min-w-[280px]'
+              )}
+            >
+              <span className="truncate">
+                {evaluation.verdict === 'correct' ? 'Next: ' : 'Try next: '}
+                {nextProblem.title}
+              </span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <ApproachReveal slug={problemSlug} />
+            <Button variant="ghost" size="sm" onClick={reset}>
+              Start a fresh attempt
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );

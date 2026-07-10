@@ -311,6 +311,138 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 }
 
 // ---------------------------------------------------------------------------
+// Continue / next-problem flow
+// ---------------------------------------------------------------------------
+
+interface ProblemLite {
+  id: string;
+  slug: string;
+  title: string;
+  difficulty: Difficulty;
+  topics: string[];
+}
+
+const DIFFICULTY_RANK: Record<Difficulty, number> = { easy: 0, medium: 1, hard: 2 };
+
+function canonicalOrder(a: ProblemLite, b: ProblemLite): number {
+  return DIFFICULTY_RANK[a.difficulty] - DIFFICULTY_RANK[b.difficulty] || a.title.localeCompare(b.title);
+}
+
+async function fetchProblemsLite(): Promise<ProblemLite[]> {
+  const db = getServiceDb();
+  const { data, error } = await db.from('problems').select('id, slug, title, difficulty, topics');
+  if (error) throw new Error(`Failed to fetch problems: ${error.message}`);
+  return ((data ?? []) as ProblemLite[]).sort(canonicalOrder);
+}
+
+function sharesTopic(a: ProblemLite, b: ProblemLite): boolean {
+  return a.topics.some((t) => b.topics.includes(t));
+}
+
+function pickNext(
+  problems: ProblemLite[],
+  solved: Set<string>,
+  from: ProblemLite | undefined,
+  exclude: Set<string>
+): ProblemLite | null {
+  const unsolved = problems.filter((p) => !solved.has(p.id) && !exclude.has(p.id));
+  if (unsolved.length === 0) return null;
+  if (!from) return unsolved[0] ?? null;
+
+  const fromIndex = problems.findIndex((p) => p.id === from.id);
+  const sameTopic = unsolved.filter((p) => p.id !== from.id && sharesTopic(p, from));
+  // Same topic, after the current one in canonical order — else wrap within
+  // the topic — else anywhere unsolved.
+  const after = sameTopic.find((p) => problems.findIndex((q) => q.id === p.id) > fromIndex);
+  return after ?? sameTopic[0] ?? unsolved.find((p) => p.id !== from.id) ?? null;
+}
+
+export interface NextProblem {
+  slug: string;
+  title: string;
+  difficulty: Difficulty;
+}
+
+/** The problem to suggest after finishing `currentProblemId`. */
+export async function getNextProblem(
+  userId: string,
+  currentProblemId: string
+): Promise<NextProblem | null> {
+  const [problems, facts] = await Promise.all([fetchProblemsLite(), fetchEvalFacts(userId)]);
+  const solved = new Set(
+    facts.filter((f) => (f.final_verdict ?? f.verdict) === 'correct').map((f) => f.problem_id)
+  );
+  const current = problems.find((p) => p.id === currentProblemId);
+  const next = pickNext(problems, solved, current, new Set([currentProblemId]));
+  return next ? { slug: next.slug, title: next.title, difficulty: next.difficulty } : null;
+}
+
+export interface ResumeItem {
+  kind: 'continue' | 'next-up';
+  slug: string;
+  title: string;
+  difficulty: Difficulty;
+  topic: string;
+  /** Best verdict so far (continue items only). */
+  verdict?: Verdict;
+  attemptedAt?: string;
+}
+
+/**
+ * Dashboard "resume" strip: up to two attempted-but-unsolved problems
+ * (most recent first) plus one suggested next problem after the latest
+ * activity. Empty for users with no attempts.
+ */
+export async function getResumeItems(userId: string): Promise<ResumeItem[]> {
+  const [problems, facts] = await Promise.all([fetchProblemsLite(), fetchEvalFacts(userId)]);
+  if (facts.length === 0) return [];
+
+  const byId = new Map(problems.map((p) => [p.id, p]));
+  const solved = new Set(
+    facts.filter((f) => (f.final_verdict ?? f.verdict) === 'correct').map((f) => f.problem_id)
+  );
+
+  // Latest attempt per unsolved problem, newest first (facts arrive desc).
+  const seen = new Set<string>();
+  const unfinished: ResumeItem[] = [];
+  for (const f of facts) {
+    if (seen.has(f.problem_id) || solved.has(f.problem_id)) continue;
+    seen.add(f.problem_id);
+    const p = byId.get(f.problem_id);
+    if (!p) continue;
+    unfinished.push({
+      kind: 'continue',
+      slug: p.slug,
+      title: p.title,
+      difficulty: p.difficulty,
+      topic: p.topics[0] ?? '',
+      verdict: f.final_verdict ?? f.verdict,
+      attemptedAt: f.created_at,
+    });
+    if (unfinished.length === 2) break;
+  }
+
+  const latest = facts[0] ? byId.get(facts[0].problem_id) : undefined;
+  const exclude = new Set<string>();
+  for (const item of unfinished) {
+    const p = problems.find((q) => q.slug === item.slug);
+    if (p) exclude.add(p.id);
+  }
+  const next = pickNext(problems, solved, latest, exclude);
+  const items = [...unfinished];
+  if (next) {
+    items.push({
+      kind: 'next-up',
+      slug: next.slug,
+      title: next.title,
+      difficulty: next.difficulty,
+      topic: next.topics[0] ?? '',
+    });
+  }
+  return items.slice(0, 3);
+}
+
+// ---------------------------------------------------------------------------
 // Leaderboard (opt-in via users.preferences.leaderboard)
 // ---------------------------------------------------------------------------
 

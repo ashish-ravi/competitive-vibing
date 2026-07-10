@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { getPublicProblemBySlug } from '@/lib/problems';
 import { countAttempts } from '@/lib/history';
+import { getNextProblem } from '@/lib/stats';
 import { slugSchema } from '@/lib/schemas';
 import { ProblemStatement } from '@/components/ProblemStatement';
 import { EvaluationSection } from '@/components/EvaluationSection';
@@ -19,7 +20,10 @@ export default async function ProblemDetailPage({ params }: { params: { slug: st
   const problem = await getPublicProblemBySlug(parsed.data);
   if (!problem) notFound();
 
-  const attempts = await countAttempts(session.user.id, problem.id);
+  const [attempts, nextProblem] = await Promise.all([
+    countAttempts(session.user.id, problem.id),
+    getNextProblem(session.user.id, problem.id),
+  ]);
 
   return (
     <div className="grid grid-cols-1 gap-6 pb-24 md:grid-cols-2 md:gap-8 md:pb-8">
@@ -31,6 +35,7 @@ export default async function ProblemDetailPage({ params }: { params: { slug: st
         problemId={problem.id}
         problemSlug={problem.slug}
         priorAttempts={attempts}
+        nextProblem={nextProblem}
       />
     </div>
   );
