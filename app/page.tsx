@@ -1,91 +1,93 @@
-import { auth, signIn } from '@/lib/auth';
-import { listProblems, listTopics } from '@/lib/problems';
-import { ProblemCard } from '@/components/ProblemCard';
-import { ProblemFilters } from '@/components/ProblemFilters';
+import { auth } from '@/lib/auth';
+import { signInAction } from '@/app/actions';
+import { listProblems } from '@/lib/problems';
+import { getProblemStatuses, getUserStats } from '@/lib/stats';
+import { HeroTerminal } from '@/components/HeroTerminal';
+import { ProblemBrowser } from '@/components/ProblemBrowser';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { topic?: string; difficulty?: string };
-}) {
+const STEPS = [
+  {
+    title: 'Explain, don’t code',
+    body: 'Pick a classic problem and describe your approach in plain English or pseudocode — the part interviews actually grade.',
+  },
+  {
+    title: 'Get a real verdict',
+    body: 'Correctness, edge cases, complexity, clarity — scored against a rubric and streamed back in seconds.',
+  },
+  {
+    title: 'Survive the follow-ups',
+    body: 'The AI interviewer probes your gaps with follow-up questions, then re-scores you. Flawed idea? Watch it break on a verified counterexample.',
+  },
+];
+
+export default async function HomePage() {
   const session = await auth();
 
   if (!session?.user) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center gap-6 py-16 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Explain the algorithm. <span className="text-primary">Before you code it.</span>
-        </h1>
-        <p className="text-muted-foreground">
-          Describe your approach in plain English or pseudocode and get instant AI feedback on
-          correctness, edge cases, and complexity — the way a real interviewer would probe your
-          thinking.
-        </p>
-        <form
-          action={async () => {
-            'use server';
-            await signIn('google');
-          }}
-        >
-          <Button size="lg" type="submit">
-            Sign in with Google
-          </Button>
-        </form>
-        <Card className="w-full text-left">
-          <CardContent className="pt-4 text-sm text-muted-foreground">
-            <p className="mb-2 font-medium text-foreground">How it works</p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>Pick a problem and read it carefully.</li>
-              <li>Explain your approach — no code needed.</li>
-              <li>Get a verdict, missed edge cases, and complexity analysis.</li>
-              <li>Answer follow-up questions like a real interview.</li>
-            </ol>
-          </CardContent>
-        </Card>
+      <div className="space-y-16 pb-16 pt-4 md:pt-10">
+        <section className="grid-fade grid items-center gap-10 md:grid-cols-2">
+          <div className="space-y-6">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+              interview prep for the thinking part
+            </p>
+            <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight md:text-5xl">
+              Talk your way through the interview.
+            </h1>
+            <p className="max-w-md text-muted-foreground">
+              150 classic problems. No editor, no autocomplete — just you explaining an algorithm
+              and an AI interviewer deciding if it holds up.
+            </p>
+            <form action={signInAction}>
+              <Button size="lg" type="submit">
+                Sign in with Google — it’s free
+              </Button>
+            </form>
+          </div>
+          <HeroTerminal />
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {STEPS.map((step, i) => (
+            <div
+              key={step.title}
+              className="animate-fade-up rounded-lg border bg-card p-5"
+              style={{ animationDelay: `${i * 120}ms` }}
+            >
+              <h2 className="prompt-heading font-display text-base font-bold">{step.title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+            </div>
+          ))}
+        </section>
       </div>
     );
   }
 
-  const difficulty =
-    searchParams.difficulty === 'easy' ||
-    searchParams.difficulty === 'medium' ||
-    searchParams.difficulty === 'hard'
-      ? searchParams.difficulty
-      : undefined;
-
-  const [problems, topics] = await Promise.all([
-    listProblems({ topic: searchParams.topic, difficulty }),
-    listTopics(),
+  const [problems, statuses, stats] = await Promise.all([
+    listProblems(),
+    getProblemStatuses(session.user.id),
+    getUserStats(session.user.id),
   ]);
 
+  const firstName = session.user.name?.split(' ')[0] ?? 'you';
+
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Problems</h1>
-        <p className="text-sm text-muted-foreground">
-          Pick one and explain how you&apos;d solve it.
-        </p>
-      </div>
-      <ProblemFilters topics={topics} />
-      {problems.length === 0 ? (
-        <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            No problems match these filters. Try clearing them — or if this is a fresh setup, run{' '}
-            <code className="rounded bg-muted px-1.5 py-0.5">npm run seed</code> to generate the
-            problem bank.
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {problems.map((p) => (
-            <ProblemCard key={p.id} problem={p} />
-          ))}
+    <div className="space-y-5">
+      <div className="grid-fade flex flex-wrap items-end justify-between gap-3 pb-2">
+        <div>
+          <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
+            {stats.streak > 0 ? `day ${stats.streak} of the streak, ${firstName}` : `pick a fight, ${firstName}`}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {stats.solvedCount} solved · level {stats.level} ·{' '}
+            <span className="font-mono">{stats.xp} xp</span>
+          </p>
         </div>
-      )}
+      </div>
+      <ProblemBrowser problems={problems} statuses={statuses} />
     </div>
   );
 }

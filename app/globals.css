@@ -2,46 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Competitive Vibing — "terminal dusk"
+ * Deep blue-charcoal surfaces (the 2am editor), electric-violet brand accent,
+ * ice-cyan for glow moments. Green/amber/rose stay reserved for what they
+ * mean: easy/medium/hard and correct/partial/incorrect.
+ */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 228 36% 98%;
+    --foreground: 230 30% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 243 75% 59%;
-    --radius: 0.625rem;
+    --card-foreground: 230 30% 11%;
+    --primary: 266 78% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 228 28% 94%;
+    --secondary-foreground: 230 24% 18%;
+    --muted: 228 28% 94%;
+    --muted-foreground: 230 12% 44%;
+    --accent: 228 28% 93%;
+    --accent-foreground: 230 24% 16%;
+    --destructive: 350 78% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 228 20% 88%;
+    --input: 228 20% 85%;
+    --ring: 266 78% 54%;
+    --radius: 0.5rem;
+
+    /* brand extras */
+    --glow: 192 90% 42%;
+    --ease: 152 55% 38%;
+    --grind: 38 92% 44%;
+    --boss: 350 78% 52%;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 8% 7%;
-    --card-foreground: 0 0% 98%;
-    --primary: 239 84% 67%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 239 84% 67%;
+    --background: 224 28% 6%;
+    --foreground: 226 30% 92%;
+    --card: 224 25% 9%;
+    --card-foreground: 226 30% 92%;
+    --primary: 264 92% 70%;
+    --primary-foreground: 264 60% 10%;
+    --secondary: 224 20% 14%;
+    --secondary-foreground: 226 24% 86%;
+    --muted: 224 20% 13%;
+    --muted-foreground: 226 12% 60%;
+    --accent: 224 20% 15%;
+    --accent-foreground: 226 24% 88%;
+    --destructive: 350 80% 62%;
+    --destructive-foreground: 350 60% 10%;
+    --border: 224 18% 17%;
+    --input: 224 18% 19%;
+    --ring: 264 92% 70%;
+
+    --glow: 190 95% 68%;
+    --ease: 152 60% 52%;
+    --grind: 40 95% 60%;
+    --boss: 351 90% 68%;
   }
 }
 
@@ -51,5 +69,51 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'ss01', 'cv05';
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.25);
+  }
+}
+
+@layer components {
+  /* Signature: headings carry a terminal prompt glyph. */
+  .prompt-heading::before {
+    content: '> ';
+    color: hsl(var(--primary));
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  /* Subtle dotted grid backdrop for hero/dashboard headers. */
+  .grid-fade {
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 85%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 85%);
+  }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-pulse-cursor,
+    .animate-caret {
+      animation: none !important;
+    }
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

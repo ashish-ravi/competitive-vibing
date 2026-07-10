@@ -1,12 +1,31 @@
 import type { Metadata, Viewport } from 'next';
+import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { ThemeScript } from '@/components/ThemeScript';
-import { NavBar } from '@/components/NavBar';
+import { SiteHeader } from '@/components/SiteHeader';
+
+const sans = IBM_Plex_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+});
+
+const display = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['500', '700'],
+  variable: '--font-display',
+});
+
+const mono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-mono',
+});
 
 export const metadata: Metadata = {
-  title: 'AlgoExplain — practice explaining algorithms',
+  title: 'Competitive Vibing — explain algorithms like you mean it',
   description:
-    'Explain your algorithm in plain English or pseudocode and get AI feedback on correctness, edge cases, and complexity — before you write a line of code.',
+    'Interview prep for the thinking part: explain your approach in plain English, get AI-graded verdicts, survive follow-up questions, and watch flawed ideas break on real counterexamples.',
 };
 
 export const viewport: Viewport = {
@@ -16,13 +35,17 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${sans.variable} ${display.variable} ${mono.variable}`}
+    >
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-dvh">
-        <NavBar />
-        <main className="mx-auto max-w-5xl px-4 py-4 md:py-6">{children}</main>
+      <body className="min-h-dvh font-sans">
+        <SiteHeader />
+        <main className="mx-auto max-w-6xl px-4 py-4 md:py-6">{children}</main>
       </body>
     </html>
   );

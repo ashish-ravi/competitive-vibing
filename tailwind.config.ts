@@ -5,6 +5,11 @@ const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -35,6 +40,11 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Brand semantics: difficulty/verdict colors + the cyan glow.
+        glow: 'hsl(var(--glow))',
+        ease: 'hsl(var(--ease))',
+        grind: 'hsl(var(--grind))',
+        boss: 'hsl(var(--boss))',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -46,9 +56,14 @@ const config: Config = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
         },
+        caret: {
+          '0%, 45%': { opacity: '1' },
+          '50%, 100%': { opacity: '0' },
+        },
       },
       animation: {
         'pulse-cursor': 'pulse-cursor 1s ease-in-out infinite',
+        caret: 'caret 1.1s step-end infinite',
       },
     },
   },
