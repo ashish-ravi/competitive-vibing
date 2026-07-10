@@ -1,8 +1,8 @@
-# AlgoExplain — CLAUDE.md
+# Competitive Vibing — CLAUDE.md
 
 ## What This App Is
 
-AlgoExplain is a mobile-first web app for coding interview practice. Users read a problem, explain their algorithm in natural language or pseudocode, and an AI evaluates their approach — checking correctness, edge cases, and complexity — without ever running code.
+Competitive Vibing is a mobile-first web app for coding interview practice. Users read a problem, explain their algorithm in natural language or pseudocode, and an AI evaluates their approach — checking correctness, edge cases, and complexity — without ever running code.
 
 ---
 
@@ -28,9 +28,13 @@ AlgoExplain is a mobile-first web app for coding interview practice. Users read 
 │   ├── layout.tsx
 │   ├── page.tsx                # Dashboard / problem list
 │   ├── problems/[slug]/
-│   │   └── page.tsx            # Problem detail + explanation input
+│   │   └── page.tsx            # Problem detail + hints + explanation input
 │   ├── history/
 │   │   └── page.tsx
+│   ├── profile/
+│   │   └── page.tsx            # XP, level, streak, badges, per-topic progress
+│   ├── leaderboard/
+│   │   └── page.tsx            # Opt-in XP ranking
 │   └── api/
 │       ├── auth/[...nextauth]/route.ts
 │       ├── problems/route.ts
@@ -70,7 +74,11 @@ npm run lint
 # Run Supabase migrations (local)
 npx supabase db push
 
-# Seed problems (AI-generated via Groq)
+# Build the problem bank (V2): NeetCode 150 canon from the web,
+# original AI-written statements + hints, self-verified before insert
+npm run import            # add --fresh to wipe and reimport
+
+# Legacy V1 seeder (20 fully AI-generated problems)
 npx tsx scripts/seed-problems.ts
 
 # Deploy (Vercel auto-deploys on push to main)

@@ -1,8 +1,8 @@
-# Architecture — AlgoExplain
+# Architecture — Competitive Vibing
 
 ## Overview
 
-AlgoExplain is a Next.js monolith deployed on Vercel. There is no separate backend service. API routes act as a BFF (Backend for Frontend) layer, calling Supabase for data and Groq for AI evaluation.
+Competitive Vibing is a Next.js monolith deployed on Vercel. There is no separate backend service. API routes act as a BFF (Backend for Frontend) layer, calling Supabase for data and Groq for AI evaluation.
 
 ---
 

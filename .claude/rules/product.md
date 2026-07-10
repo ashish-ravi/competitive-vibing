@@ -2,7 +2,7 @@
 
 ## Core Purpose
 
-AlgoExplain helps users practice **explaining** algorithms, not coding them. The value is AI feedback on thinking quality, not syntax. Every product decision must reinforce this.
+Competitive Vibing helps users practice **explaining** algorithms, not coding them. The value is AI feedback on thinking quality, not syntax. Every product decision must reinforce this.
 
 ---
 

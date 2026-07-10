@@ -1,4 +1,4 @@
-# Roadmap — AlgoExplain
+# Roadmap — Competitive Vibing
 
 ## V1 — Core Product (~6 weeks)
 

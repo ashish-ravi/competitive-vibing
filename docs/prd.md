@@ -1,4 +1,4 @@
-# Product Requirements Document — AlgoExplain
+# Product Requirements Document — Competitive Vibing
 
 ## Problem Statement
 
