@@ -36,7 +36,7 @@ const STEPS = [
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: { topic?: string; difficulty?: string };
+  searchParams: { topic?: string; difficulty?: string; from?: string };
 }) {
   const session = await auth();
 
@@ -89,6 +89,11 @@ export default async function HomePage({
   const firstName = session.user.name?.split(' ')[0] ?? 'you';
   const topic = searchParams.topic;
   const topicProgress = topic ? stats.topics.find((t) => t.topic === topic) : undefined;
+  // Back link mirrors where the user came from (explore roadmap vs library grid).
+  const backLink =
+    searchParams.from === 'explore'
+      ? { href: '/explore', label: '← explore' }
+      : { href: '/', label: '← all topics' };
 
   return (
     <div className="flex gap-6">
@@ -97,10 +102,10 @@ export default async function HomePage({
           // Topic page: focused header, no greeting/resume noise.
           <div className="pb-1">
             <Link
-              href="/"
+              href={backLink.href}
               className="font-mono text-xs text-primary underline-offset-4 hover:underline"
             >
-              ← all topics
+              {backLink.label}
             </Link>
             <h1 className="prompt-heading mt-2 font-display text-2xl font-bold tracking-tight">
               {topicLabel(topic)}

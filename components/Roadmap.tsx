@@ -46,7 +46,7 @@ function TopicTile({ item, dimmed }: { item: RoadmapTopic; dimmed: boolean }) {
   const complete = item.solved >= item.total;
   return (
     <Link
-      href={`/?topic=${encodeURIComponent(item.topic)}`}
+      href={`/?topic=${encodeURIComponent(item.topic)}&from=explore`}
       className={cn(
         'group flex items-center gap-3.5 rounded-lg border bg-card p-4 transition-all duration-200',
         'hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10',
