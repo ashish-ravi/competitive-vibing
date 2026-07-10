@@ -60,10 +60,20 @@ const config: Config = {
           '0%, 45%': { opacity: '1' },
           '50%, 100%': { opacity: '0' },
         },
+        'slide-in': {
+          from: { transform: 'translateX(100%)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'backdrop-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
       },
       animation: {
         'pulse-cursor': 'pulse-cursor 1s ease-in-out infinite',
         caret: 'caret 1.1s step-end infinite',
+        'slide-in': 'slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'backdrop-in': 'backdrop-in 0.2s ease-out both',
       },
     },
   },
