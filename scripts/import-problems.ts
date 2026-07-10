@@ -61,8 +61,9 @@ const GENERATION_SYSTEM_PROMPT = `You are a technical interview problem designer
 Rules:
 - The problem must test the same algorithmic concept the classic is famous for, so someone who has seen the classic recognizes it by its behavior.
 - Write every sentence yourself. Do NOT reproduce or closely paraphrase the wording of any existing website's problem statement. Fresh prose, your own example values.
-- The statement must be self-contained and unambiguous: define the input, the output, and what to return. Use markdown.
-- Include 2–3 concrete examples with inputs, outputs, and a one-sentence explanation each.
+- The statement must be self-contained and unambiguous: define the input, the output, and what to return. Use markdown. If duplicates or ordering could be ambiguous (e.g. unique triplets, result order), state the rule explicitly.
+- Include 2–3 concrete examples with inputs, outputs, and a one-sentence explanation each. Example "input" and "output" fields are always STRINGS — stringify arrays and matrices, e.g. "[[1,2],[3,4]]".
+- expected_approach.algorithm is a short kebab-case technique name, e.g. "topological-sort", "two-pointers", "simulation".
 - Include specific constraints (input sizes, value ranges) consistent with the difficulty.
 - expected_approach describes the canonical solution a senior engineer would give.
 - hints: exactly 3 escalating hints. Hint 1 is a gentle nudge (what to notice). Hint 2 names the technique family without giving the algorithm. Hint 3 outlines the approach shape but stops short of full pseudocode. Never include code.
@@ -93,30 +94,9 @@ const GENERATION_JSON_SCHEMA: Record<string, unknown> = {
       type: 'object',
       properties: {
         summary: { type: 'string' },
-        algorithm: {
-          type: 'string',
-          enum: [
-            'hash-map',
-            'two-pointers',
-            'sliding-window',
-            'bfs',
-            'dfs',
-            'dynamic-programming',
-            'binary-search',
-            'sorting',
-            'stack',
-            'heap',
-            'greedy',
-            'recursion',
-            'backtracking',
-            'trie',
-            'union-find',
-            'bit-manipulation',
-            'math',
-            'linked-list',
-            'other',
-          ],
-        },
+        // Free-form kebab-case: classics span more techniques than any enum
+        // (topological-sort, simulation, inorder-traversal, ...).
+        algorithm: { type: 'string' },
         time_complexity: { type: 'string' },
         space_complexity: { type: 'string' },
         key_insight: { type: 'string' },
@@ -265,7 +245,9 @@ async function main() {
     }
 
     let done = false;
-    for (let attempt = 1; attempt <= 2 && !done; attempt++) {
+    // Attempts 1-2 use the fast default model; attempt 3 escalates to the
+    // strong reasoning model for classics whose semantics are hard to state.
+    for (let attempt = 1; attempt <= 3 && !done; attempt++) {
       if (i > 0 || attempt > 1) await sleep(2000);
       try {
         const { data } = await groqJson<unknown>({
@@ -274,7 +256,9 @@ async function main() {
           schemaName: 'problem_import',
           schema: GENERATION_JSON_SCHEMA,
           temperature: 0.7,
-          maxTokens: 4000,
+          maxTokens: attempt >= 3 ? 3500 : 4000,
+          model: attempt >= 3 ? 'openai/gpt-oss-120b' : undefined,
+          reasoningEffort: 'medium',
         });
         const problem = generatedSchema.parse(data);
 
