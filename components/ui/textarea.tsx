@@ -4,9 +4,9 @@ import { cn } from '@/lib/utils';
 const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
   ({ className, ...props }, ref) => (
     <textarea
-      // text-base (16px) prevents iOS auto-zoom on focus
+      // 17px: the reading size, and above the 16px iOS auto-zoom threshold.
       className={cn(
-        'flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+        'flex w-full rounded-xl border border-transparent bg-secondary px-4 py-3 text-[17px] leading-relaxed text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
       ref={ref}

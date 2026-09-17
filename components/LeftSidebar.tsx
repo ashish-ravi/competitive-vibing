@@ -2,13 +2,13 @@ import { auth } from '@/lib/auth';
 import { SidebarNav } from '@/components/SidebarNav';
 
 /**
- * Presentational rail: flush full-height panel, opaque (the global dot
- * backdrop never shows through), separated by a single hairline.
+ * Desktop navigation rail. Sits directly on the page surface with no
+ * border or fill of its own — the selected item is the only chrome.
  */
 export function SidebarPanel() {
   return (
-    <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 shrink-0 border-r bg-background lg:block">
-      <div className="py-5 pl-3 pr-4">
+    <aside className="sticky top-12 hidden h-[calc(100dvh-3rem)] w-60 shrink-0 lg:block">
+      <div className="py-8 pl-6">
         <SidebarNav />
       </div>
     </aside>

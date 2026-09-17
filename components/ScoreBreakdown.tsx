@@ -15,30 +15,30 @@ const DIMENSIONS: { key: keyof Omit<Scores, 'total'>; label: string; max: number
 
 export function ScoreBreakdown({ scores }: { scores: Scores }) {
   return (
-    <div className="space-y-2">
+    <div>
       <div className="flex items-baseline justify-between">
-        <span className="text-sm font-semibold">Score</span>
-        <span className="text-2xl font-bold tabular-nums">
+        <span className="text-[15px] font-semibold">Score</span>
+        <span className="text-[40px] font-semibold leading-none tabular-nums tracking-display">
           {scores.total}
-          <span className="text-sm font-normal text-muted-foreground">/100</span>
+          <span className="ml-1 text-[15px] font-normal text-muted-foreground">of 100</span>
         </span>
       </div>
-      <div className="space-y-1.5">
+      <dl className="mt-4 space-y-2.5">
         {DIMENSIONS.map(({ key, label, max }) => (
-          <div key={key} className="flex items-center gap-2 text-xs">
-            <span className="w-20 shrink-0 text-muted-foreground">{label}</span>
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+          <div key={key} className="flex items-center gap-3 text-[14px]">
+            <dt className="w-24 shrink-0 text-muted-foreground">{label}</dt>
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
               <div
-                className="h-full rounded-full bg-primary transition-all"
+                className="h-full rounded-full bg-primary transition-[width] duration-500"
                 style={{ width: `${(scores[key] / max) * 100}%` }}
               />
             </div>
-            <span className="w-10 shrink-0 text-right tabular-nums text-muted-foreground">
+            <dd className="w-12 shrink-0 text-right tabular-nums text-muted-foreground">
               {scores[key]}/{max}
-            </span>
+            </dd>
           </div>
         ))}
-      </div>
+      </dl>
     </div>
   );
 }

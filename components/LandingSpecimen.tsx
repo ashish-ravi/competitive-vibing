@@ -5,7 +5,7 @@
  */
 export function LandingSpecimen() {
   return (
-    <figure className="rounded-xl border bg-card p-6 shadow-sm md:p-8">
+    <figure className="rounded-2xl bg-card p-6 md:p-8">
       <figcaption className="flex items-baseline justify-between gap-3 text-[13px] text-muted-foreground">
         <span>Two Sum · Easy</span>
         <span>Sample evaluation</span>
@@ -17,7 +17,7 @@ export function LandingSpecimen() {
         array.”
       </blockquote>
 
-      <div className="mt-6 border-t pt-5">
+      <div className="mt-6 border-t border-border pt-5">
         <div className="flex items-center gap-2">
           <svg
             className="h-5 w-5 text-ease"

@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { ActivityCalendar } from '@/components/ActivityCalendar';
+import { ChevronLink } from '@/components/ChevronLink';
 import { UserAvatar } from '@/components/UserAvatar';
 import { cn } from '@/lib/utils';
 import type { LeaderboardRow, UserStats } from '@/lib/stats';
@@ -10,9 +10,15 @@ const DIFFICULTY_BAR: Record<string, string> = {
   hard: 'bg-boss',
 };
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+function Tile({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <section className={cn('rounded-2xl bg-card p-5', className)}>{children}</section>;
+}
 
-/** Compact progress panel for the desktop right rail (library page). */
+function TileTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-[15px] font-semibold">{children}</h2>;
+}
+
+/** Desktop right rail: level, calendar, difficulty progress, badges, top five. */
 export function ProgressRail({
   stats,
   leaderboard = [],
@@ -24,130 +30,126 @@ export function ProgressRail({
   currentUserId?: string;
   solvedDays?: string[];
 }) {
+  const pct = Math.round((stats.intoLevel / stats.forNext) * 100);
+
   return (
-    <aside className="hidden w-72 shrink-0 xl:block">
-      <div className="sticky top-[4.5rem] space-y-3">
-        <div className="rounded-lg border bg-card p-4">
+    <aside className="hidden w-[300px] shrink-0 xl:block">
+      <div className="sticky top-[4.5rem] space-y-4">
+        <Tile>
           <div className="flex items-baseline justify-between">
-            <span className="rounded-full bg-primary/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-primary">
-              lvl {stats.level}
-            </span>
-            <span className="font-mono text-xs text-muted-foreground">
-              {stats.intoLevel}/{stats.forNext} xp
-            </span>
+            <p className="text-[22px] font-semibold tracking-title">Level {stats.level}</p>
+            <p className="text-[13px] text-muted-foreground">
+              {stats.forNext - stats.intoLevel} XP to level {stats.level + 1}
+            </p>
           </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-primary to-glow"
-              style={{ width: `${(stats.intoLevel / stats.forNext) * 100}%` }}
-            />
+          <div
+            className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary"
+            role="progressbar"
+            aria-valuenow={pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progress to next level"
+          >
+            <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-md bg-muted/60 px-2.5 py-2">
-              <p className="font-mono text-lg font-semibold tabular-nums leading-none">
+          <dl className="mt-5 grid grid-cols-2 gap-4">
+            <div>
+              <dd className="text-[28px] font-semibold leading-none tabular-nums tracking-title">
                 {stats.streak}
-              </p>
-              <p className="mt-1 text-[11px] text-muted-foreground">day streak</p>
+              </dd>
+              <dt className="mt-1.5 text-[13px] text-muted-foreground">
+                day{stats.streak === 1 ? '' : 's'} in a row
+              </dt>
             </div>
-            <div className="rounded-md bg-muted/60 px-2.5 py-2">
-              <p className="font-mono text-lg font-semibold tabular-nums leading-none">
+            <div>
+              <dd className="text-[28px] font-semibold leading-none tabular-nums tracking-title">
                 {stats.solvedCount}
-              </p>
-              <p className="mt-1 text-[11px] text-muted-foreground">solved</p>
+              </dd>
+              <dt className="mt-1.5 text-[13px] text-muted-foreground">solved</dt>
             </div>
-          </div>
-          <div className="mt-3 border-t pt-3">
+          </dl>
+          <div className="mt-5 border-t border-border pt-4">
             <ActivityCalendar solvedDays={solvedDays} />
           </div>
-        </div>
+        </Tile>
 
-        <div className="rounded-lg border bg-card p-4">
-          <p className="prompt-heading font-display text-sm font-bold lowercase">progress</p>
-          <div className="mt-3 space-y-2.5">
+        <Tile>
+          <TileTitle>Progress</TileTitle>
+          <ul className="mt-3 space-y-3">
             {stats.byDifficulty.map((d) => (
-              <div key={d.difficulty} className="flex items-center gap-2.5">
-                <span className="w-14 font-mono text-[11px] capitalize text-muted-foreground">
-                  {d.difficulty}
-                </span>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+              <li key={d.difficulty} className="flex items-center gap-3">
+                <span className="w-16 text-[13px] capitalize text-muted-foreground">{d.difficulty}</span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
                   <div
                     className={cn('h-full rounded-full', DIFFICULTY_BAR[d.difficulty])}
                     style={{ width: `${d.total ? (d.solved / d.total) * 100 : 0}%` }}
                   />
                 </div>
-                <span className="w-12 text-right font-mono text-[11px] tabular-nums text-muted-foreground">
+                <span className="w-14 text-right text-[13px] tabular-nums text-muted-foreground">
                   {d.solved}/{d.total}
                 </span>
-              </div>
+              </li>
             ))}
-          </div>
-          <Link
-            href="/profile"
-            className="mt-3 inline-block font-mono text-xs text-primary underline-offset-4 hover:underline"
-          >
-            full profile →
-          </Link>
-        </div>
+          </ul>
+          <ChevronLink href="/profile" className="mt-1 min-h-[36px] text-[14px]">
+            Full profile
+          </ChevronLink>
+        </Tile>
 
-        <div className="rounded-lg border bg-card p-4">
-          <p className="prompt-heading font-display text-sm font-bold lowercase">badges</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
+        <Tile>
+          <TileTitle>Badges</TileTitle>
+          <div className="mt-3 flex flex-wrap gap-2">
             {stats.badges.map((b) => (
               <span
                 key={b.id}
                 title={`${b.name} — ${b.description}`}
                 className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-md border text-base',
-                  b.earned ? 'border-primary/40 bg-primary/5' : 'opacity-35 grayscale'
+                  'flex h-10 w-10 items-center justify-center rounded-xl text-lg',
+                  b.earned ? 'bg-secondary' : 'bg-secondary/50 opacity-35 grayscale'
                 )}
               >
                 {b.icon}
               </span>
             ))}
           </div>
-        </div>
+        </Tile>
 
-        <div className="rounded-lg border bg-card p-4">
-          <p className="prompt-heading font-display text-sm font-bold lowercase">leaderboard</p>
+        <Tile>
+          <TileTitle>Leaderboard</TileTitle>
           {leaderboard.length === 0 ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Nobody&apos;s on the board yet — be the first to claim rank #1.
+            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+              Nobody is on the board yet. Join it from your profile.
             </p>
           ) : (
-            <ul className="mt-2 space-y-1">
+            <ol className="mt-2">
               {leaderboard.map((row) => {
                 const isYou = row.userId === currentUserId;
                 return (
                   <li
                     key={row.userId}
                     className={cn(
-                      'flex items-center gap-2 rounded-md px-1.5 py-1',
-                      isYou && 'bg-primary/5'
+                      '-mx-2 flex items-center gap-3 rounded-lg px-2 py-1.5',
+                      isYou && 'bg-primary/[0.07]'
                     )}
                   >
-                    <span className="w-5 text-center font-mono text-[11px] tabular-nums text-muted-foreground">
-                      {MEDALS[row.rank - 1] ?? row.rank}
+                    <span className="w-4 text-center text-[13px] tabular-nums text-muted-foreground">
+                      {row.rank}
                     </span>
-                    <UserAvatar name={row.name} image={row.avatarUrl} size={20} />
-                    <span className="min-w-0 flex-1 truncate text-xs font-medium">
+                    <UserAvatar name={row.name} image={row.avatarUrl} size={24} />
+                    <span className="min-w-0 flex-1 truncate text-[14px] font-medium">
                       {row.name}
-                      {isYou && <span className="ml-1 text-primary">(you)</span>}
+                      {isYou && <span className="ml-1 font-normal text-muted-foreground">(you)</span>}
                     </span>
-                    <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
-                      {row.xp}
-                    </span>
+                    <span className="text-[13px] tabular-nums text-muted-foreground">{row.xp} XP</span>
                   </li>
                 );
               })}
-            </ul>
+            </ol>
           )}
-          <Link
-            href="/leaderboard"
-            className="mt-3 inline-block font-mono text-xs text-primary underline-offset-4 hover:underline"
-          >
-            full leaderboard →
-          </Link>
-        </div>
+          <ChevronLink href="/leaderboard" className="mt-1 min-h-[36px] text-[14px]">
+            Full leaderboard
+          </ChevronLink>
+        </Tile>
       </div>
     </aside>
   );

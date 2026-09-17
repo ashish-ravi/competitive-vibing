@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { FinalAssessmentCard } from '@/components/FinalAssessmentCard';
 import { InterviewTurn, type TurnResolution } from '@/components/InterviewTurn';
+import { Notice } from '@/components/Notice';
 import { RateLimitNotice } from '@/components/RateLimitNotice';
 import { readNdjsonStream } from '@/lib/stream';
 import { MAX_ANSWER_CHARS } from '@/lib/schemas';
@@ -134,7 +135,7 @@ export function InterviewPanel({
         setPhase('answering');
       }
     } catch {
-      setError('Network hiccup — your answer was not saved. Please try again.');
+      setError('Your answer was not saved. Check your connection and try again.');
       setPhase('answering');
     }
   }
@@ -144,12 +145,12 @@ export function InterviewPanel({
   if (phase === 'invite') {
     return (
       <Card>
-        <CardContent className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between md:p-6">
           <div>
-            <p className="text-sm font-semibold">Continue as an interview?</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[17px] font-semibold tracking-title">Continue as an interview?</p>
+            <p className="mt-0.5 text-[15px] leading-relaxed text-muted-foreground">
               Answer {questions.length} follow-up question{questions.length === 1 ? '' : 's'} and
-              get a final assessment — like the real thing.
+              get a final assessment, the way a real interview goes.
             </p>
           </div>
           <Button onClick={() => setPhase('answering')} className="shrink-0">
@@ -161,10 +162,13 @@ export function InterviewPanel({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Interview</CardTitle>
+        <CardHeader>
+          <CardTitle className="text-[22px]">Interview</CardTitle>
+          <p className="text-[13px] text-muted-foreground">
+            Question {Math.min(currentIndex + 1, questions.length)} of {questions.length}
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
           {questions.slice(0, Math.min(currentIndex + 1, questions.length)).map((q, i) => (
@@ -177,17 +181,18 @@ export function InterviewPanel({
           ))}
 
           {!allAnswered && (phase === 'answering' || phase === 'submitting') && (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-1">
               <Textarea
                 value={draft}
                 onChange={(e) => setDraft(e.target.value.slice(0, MAX_ANSWER_CHARS))}
-                placeholder="Answer in 1–3 sentences…"
+                placeholder="Answer in one to three sentences"
                 rows={3}
                 disabled={phase === 'submitting'}
                 maxLength={MAX_ANSWER_CHARS}
+                aria-label="Your answer"
               />
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs tabular-nums text-muted-foreground">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[13px] tabular-nums text-muted-foreground">
                   {MAX_ANSWER_CHARS - draft.length} characters left
                 </span>
                 <Button
@@ -198,7 +203,7 @@ export function InterviewPanel({
                   {phase === 'submitting'
                     ? 'Sending…'
                     : currentIndex + 1 === questions.length
-                      ? 'Send & get final assessment'
+                      ? 'Send and get assessment'
                       : 'Send answer'}
                 </Button>
               </div>
@@ -206,14 +211,14 @@ export function InterviewPanel({
           )}
 
           {error && (
-            <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+            <Notice tone="error">
               {error}{' '}
               {allAnswered && (
-                <button onClick={finalize} className="font-semibold underline underline-offset-2">
+                <button onClick={finalize} className="font-semibold text-primary hover:underline">
                   Retry assessment
                 </button>
               )}
-            </div>
+            </Notice>
           )}
           {retryAfter !== null && <RateLimitNotice retryAfter={retryAfter} />}
         </CardContent>

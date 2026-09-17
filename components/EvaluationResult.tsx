@@ -25,12 +25,10 @@ interface EvaluationResultProps {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        {title}
-      </h3>
-      {children}
-    </div>
+    <section className="animate-rise border-t border-border pt-4">
+      <h3 className="text-[15px] font-semibold">{title}</h3>
+      <div className="mt-1.5 space-y-2">{children}</div>
+    </section>
   );
 }
 
@@ -39,17 +37,17 @@ export function EvaluationResult({ evaluation, streaming, footer }: EvaluationRe
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-base">Evaluation</CardTitle>
+      <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+        <CardTitle className="text-[22px]">Evaluation</CardTitle>
         {verdict ? (
-          <VerdictBadge verdict={verdict} />
+          <VerdictBadge verdict={verdict} className="px-3 py-1 text-[13px]" />
         ) : (
-          streaming && <span className="text-xs text-muted-foreground">thinking…</span>
+          streaming && <span className="text-[13px] text-muted-foreground">Reading…</span>
         )}
       </CardHeader>
       <CardContent className="space-y-4">
         {commentary && (
-          <p className="text-sm leading-relaxed">
+          <p className="animate-rise text-[17px] leading-relaxed">
             {commentary}
             {streaming && !correctness && <StreamingCursor />}
           </p>
@@ -57,7 +55,7 @@ export function EvaluationResult({ evaluation, streaming, footer }: EvaluationRe
 
         {correctness && (
           <Section title="Correctness">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[15px] leading-relaxed text-muted-foreground">
               {correctness.explanation}
               {streaming && !edgeCases && <StreamingCursor />}
             </p>
@@ -67,22 +65,25 @@ export function EvaluationResult({ evaluation, streaming, footer }: EvaluationRe
         {edgeCases && (
           <Section title="Edge cases">
             {edgeCases.missed.length > 0 ? (
-              <ul className="space-y-1 text-sm">
+              <ul className="space-y-1.5 text-[15px] leading-relaxed">
                 {edgeCases.missed.map((edge, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="text-amber-600 dark:text-amber-400" aria-hidden>
-                      ⚠
-                    </span>
+                  <li key={i} className="flex gap-2.5">
+                    <svg className="mt-[3px] h-4 w-4 shrink-0 text-grind" viewBox="0 0 24 24" fill="currentColor" aria-label="Missed">
+                      <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 5h2.4v7h-2.4V7Zm1.2 10.6a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Z" />
+                    </svg>
                     <span>{edge}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-emerald-700 dark:text-emerald-400">
-                All the major edge cases are covered — nice.
+              <p className="flex items-center gap-2 text-[15px] text-ease">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.3 14.3-3.9-3.9 1.5-1.5 2.4 2.4 5.5-5.5 1.5 1.5-7 7Z" />
+                </svg>
+                All the major edge cases are covered.
               </p>
             )}
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[15px] leading-relaxed text-muted-foreground">
               {edgeCases.explanation}
               {streaming && !complexity && <StreamingCursor />}
             </p>
@@ -91,27 +92,31 @@ export function EvaluationResult({ evaluation, streaming, footer }: EvaluationRe
 
         {complexity && (
           <Section title="Complexity">
-            <div className="flex flex-wrap gap-3 font-mono text-sm">
-              <span>
-                <span className="text-muted-foreground">time </span>
-                {complexity.time}
-              </span>
-              <span>
-                <span className="text-muted-foreground">space </span>
-                {complexity.space}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">
+            <dl className="flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground">Time</dt>
+                <dd className="font-mono">{complexity.time}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground">Space</dt>
+                <dd className="font-mono">{complexity.space}</dd>
+              </div>
+            </dl>
+            <p className="text-[15px] leading-relaxed text-muted-foreground">
               {complexity.explanation}
               {streaming && !scores && <StreamingCursor />}
             </p>
           </Section>
         )}
 
-        {scores && <ScoreBreakdown scores={scores} />}
+        {scores && (
+          <div className="animate-rise border-t border-border pt-4">
+            <ScoreBreakdown scores={scores} />
+          </div>
+        )}
 
         {streaming && !commentary && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-[15px] text-muted-foreground">
             Reading your approach
             <StreamingCursor />
           </p>

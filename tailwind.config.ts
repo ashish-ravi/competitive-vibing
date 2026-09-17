@@ -1,14 +1,25 @@
 import type { Config } from 'tailwindcss';
 
+// System typeface first: SF Pro on Apple devices, Segoe/Roboto elsewhere.
+const SYSTEM_SANS = [
+  '-apple-system',
+  'BlinkMacSystemFont',
+  '"SF Pro Text"',
+  '"SF Pro Display"',
+  '"Helvetica Neue"',
+  'Helvetica',
+  'Arial',
+  'sans-serif',
+];
+
 const config: Config = {
   darkMode: 'class',
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
-        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
+        sans: SYSTEM_SANS,
+        mono: ['ui-monospace', '"SF Mono"', 'Menlo', 'Consolas', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -40,16 +51,17 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // Brand semantics: difficulty/verdict colors + the cyan glow.
-        glow: 'hsl(var(--glow))',
+        // Semantic: difficulty (easy/medium/hard) and verdict (correct/partial/needs work).
         ease: 'hsl(var(--ease))',
         grind: 'hsl(var(--grind))',
         boss: 'hsl(var(--boss))',
       },
       borderRadius: {
+        sm: '8px',
+        md: '10px',
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        xl: '14px',
+        '2xl': '18px',
       },
       keyframes: {
         'slide-in': {
@@ -60,10 +72,15 @@ const config: Config = {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
+        rise: {
+          from: { opacity: '0', transform: 'translateY(6px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
-        'slide-in': 'slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'slide-in': 'slide-in 0.32s cubic-bezier(0.32, 0.72, 0, 1) both',
         'backdrop-in': 'backdrop-in 0.2s ease-out both',
+        rise: 'rise 0.3s cubic-bezier(0.32, 0.72, 0, 1) both',
       },
     },
   },

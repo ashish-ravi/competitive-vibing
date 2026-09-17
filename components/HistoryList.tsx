@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { HistoryItem } from '@/components/HistoryItem';
 import type { Difficulty } from '@/lib/db';
 import type { HistoryItem as HistoryItemData } from '@/lib/history';
+import { cn } from '@/lib/utils';
 
 interface ProblemGroup {
   problemId: string;
@@ -29,32 +29,31 @@ export function HistoryList({ items }: { items: HistoryItemData[] }) {
   const groups = groupByProblem(items);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {groups.map((group) => (
-        <Card key={group.problemId}>
-          <CardHeader className="flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-base">
+        <section key={group.problemId} className="overflow-hidden rounded-2xl bg-card">
+          <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-5">
+            <h2 className="min-w-0 truncate text-[17px] font-semibold tracking-title">
               {group.problem ? (
-                <Link
-                  href={`/problems/${group.problem.slug}`}
-                  className="hover:underline underline-offset-4"
-                >
+                <Link href={`/problems/${group.problem.slug}`} className="hover:underline">
                   {group.problem.title}
                 </Link>
               ) : (
                 'Removed problem'
               )}
-            </CardTitle>
+            </h2>
             {group.problem && (
               <DifficultyBadge difficulty={group.problem.difficulty as Difficulty} />
             )}
-          </CardHeader>
-          <CardContent className="divide-y">
-            {group.items.map((item) => (
-              <HistoryItem key={item.id} item={item} />
+          </div>
+          <ul>
+            {group.items.map((item, i) => (
+              <li key={item.id} className={cn(i > 0 && 'border-t border-border')}>
+                <HistoryItem item={item} />
+              </li>
             ))}
-          </CardContent>
-        </Card>
+          </ul>
+        </section>
       ))}
     </div>
   );

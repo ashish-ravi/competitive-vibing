@@ -5,6 +5,7 @@ import { listHistory } from '@/lib/history';
 import { historyQuerySchema } from '@/lib/schemas';
 import { EmptyState } from '@/components/EmptyState';
 import { HistoryList } from '@/components/HistoryList';
+import { PageHeader } from '@/components/PageHeader';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -28,20 +29,17 @@ export default async function HistoryPage({
   }
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">History</h1>
-        <p className="text-sm text-muted-foreground">Your past evaluations, newest first.</p>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-8">
+      <PageHeader title="History" description="Every evaluation you’ve received, newest first." />
       <HistoryList items={items} />
       {(page > 1 || hasMore) && (
         <div className="flex items-center justify-between">
           {page > 1 ? (
             <Link
               href={`/history?page=${page - 1}`}
-              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+              className={cn(buttonVariants({ variant: 'secondary' }))}
             >
-              ← Newer
+              Newer
             </Link>
           ) : (
             <span />
@@ -49,9 +47,9 @@ export default async function HistoryPage({
           {hasMore && (
             <Link
               href={`/history?page=${page + 1}`}
-              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+              className={cn(buttonVariants({ variant: 'secondary' }))}
             >
-              Older →
+              Older
             </Link>
           )}
         </div>

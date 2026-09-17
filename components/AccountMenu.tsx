@@ -22,15 +22,15 @@ export function AccountMenu({ name, email, image }: AccountMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="rounded-full ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="ml-1 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label="Account menu"
       >
-        <UserAvatar name={name} image={image} size={34} />
+        <UserAvatar name={name} image={image} size={30} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
-          <span className="block font-medium text-foreground">{name ?? 'Signed in'}</span>
-          {email && <span className="block truncate text-xs">{email}</span>}
+          <span className="block text-[15px] font-medium text-foreground">{name ?? 'Signed in'}</span>
+          {email && <span className="block truncate">{email}</span>}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
@@ -39,15 +39,11 @@ export function AccountMenu({ name, email, image }: AccountMenuProps) {
         <DropdownMenuItem asChild>
           <Link href="/history">History</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/leaderboard">Leaderboard</Link>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={() => {
             void signOutAction();
           }}
-          className="text-destructive focus:text-destructive"
         >
           Sign out
         </DropdownMenuItem>

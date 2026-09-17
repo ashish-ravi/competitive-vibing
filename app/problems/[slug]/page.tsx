@@ -26,8 +26,8 @@ export default async function ProblemDetailPage({ params }: { params: { slug: st
   ]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 pb-24 md:grid-cols-2 md:gap-8 md:pb-8">
-      <div className="space-y-4">
+    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 pb-24 md:grid-cols-2 md:gap-12 md:pb-8 lg:gap-16">
+      <div className="space-y-6">
         <ProblemStatement problem={problem} />
         <HintsPanel hints={problem.hints ?? []} />
       </div>

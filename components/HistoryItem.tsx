@@ -1,36 +1,30 @@
 import Link from 'next/link';
+import { Chevron } from '@/components/ChevronLink';
 import { VerdictBadge } from '@/components/VerdictBadge';
 import { formatRelativeTime } from '@/lib/utils';
 import type { HistoryItem as HistoryItemData } from '@/lib/history';
 
 export function HistoryItem({ item }: { item: HistoryItemData }) {
+  const extras: string[] = [];
+  if (item.interview_status === 'complete') extras.push('Interviewed');
+  if (item.counterexample_status === 'verified') extras.push('Counterexample');
+
   return (
     <Link
       href={`/history/${item.id}`}
-      className="flex min-h-[44px] items-center justify-between gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group flex min-h-[56px] items-center gap-4 px-5 py-3 transition-colors hover:bg-black/[0.025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring dark:hover:bg-white/[0.04]"
     >
-      <div className="flex min-w-0 items-center gap-2">
-        <VerdictBadge verdict={item.final_verdict ?? item.verdict} />
-        <span className="tabular-nums text-sm font-medium">
-          {item.final_score ?? item.score}
-        </span>
-        {item.interview_status === 'complete' && (
-          <span
-            className="text-xs text-muted-foreground"
-            title="Completed the follow-up interview"
-          >
-            💬 interviewed
-          </span>
-        )}
-        {item.counterexample_status === 'verified' && (
-          <span className="text-xs text-muted-foreground" title="Has a verified counterexample">
-            💥
-          </span>
-        )}
-      </div>
-      <span className="shrink-0 text-xs text-muted-foreground">
+      <span className="w-10 text-[17px] font-semibold tabular-nums tracking-title">
+        {item.final_score ?? item.score}
+      </span>
+      <VerdictBadge verdict={item.final_verdict ?? item.verdict} />
+      <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">
+        {extras.join(' · ')}
+      </span>
+      <span className="shrink-0 text-[13px] text-muted-foreground">
         {formatRelativeTime(item.created_at)}
       </span>
+      <Chevron className="h-4 w-4 shrink-0 text-muted-foreground/60 group-hover:text-primary" />
     </Link>
   );
 }

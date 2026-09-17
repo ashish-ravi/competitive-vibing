@@ -16,7 +16,7 @@ export function initialsOf(name: string | null | undefined): string {
   return (first + last).toUpperCase() || '?';
 }
 
-/** Google avatar when present; otherwise a branded initials tile. */
+/** Google avatar when present; otherwise initials on the system grey gradient. */
 export function UserAvatar({ name, image, size = 32, className }: UserAvatarProps) {
   if (image) {
     return (
@@ -31,9 +31,9 @@ export function UserAvatar({ name, image, size = 32, className }: UserAvatarProp
   }
   return (
     <span
-      style={{ width: size, height: size, fontSize: Math.max(11, Math.round(size * 0.38)) }}
+      style={{ width: size, height: size, fontSize: Math.max(11, Math.round(size * 0.4)) }}
       className={cn(
-        'flex items-center justify-center rounded-full bg-gradient-to-br from-primary to-glow font-mono font-semibold text-white',
+        'flex items-center justify-center rounded-full bg-gradient-to-b from-[#a9adb5] to-[#7c8089] font-semibold text-white',
         className
       )}
       aria-hidden

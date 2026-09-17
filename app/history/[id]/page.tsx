@@ -12,6 +12,7 @@ import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { EvaluationResult, type PartialEvaluation } from '@/components/EvaluationResult';
 import { FinalAssessmentCard } from '@/components/FinalAssessmentCard';
 import { InterviewTurn } from '@/components/InterviewTurn';
+import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import type { Difficulty } from '@/lib/db';
@@ -62,36 +63,34 @@ export default async function HistoryDetailPage({ params }: { params: { id: stri
   const turns = evaluation.interview_turns ?? [];
 
   return (
-    <div className="mx-auto max-w-lg space-y-4">
-      <div className="space-y-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-xl font-bold tracking-tight">
-            {evaluation.problem ? (
-              <Link
-                href={`/problems/${evaluation.problem.slug}`}
-                className="hover:underline underline-offset-4"
-              >
-                {evaluation.problem.title}
-              </Link>
-            ) : (
-              'Removed problem'
+    <div className="mx-auto max-w-2xl space-y-6">
+      <PageHeader
+        back={{ href: '/history', label: 'History' }}
+        title={
+          evaluation.problem ? (
+            <Link href={`/problems/${evaluation.problem.slug}`} className="hover:underline">
+              {evaluation.problem.title}
+            </Link>
+          ) : (
+            'Removed problem'
+          )
+        }
+        description={
+          <span className="inline-flex flex-wrap items-center gap-2">
+            {evaluation.problem && (
+              <DifficultyBadge difficulty={evaluation.problem.difficulty as Difficulty} />
             )}
-          </h1>
-          {evaluation.problem && (
-            <DifficultyBadge difficulty={evaluation.problem.difficulty as Difficulty} />
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Attempted {formatRelativeTime(evaluation.created_at)}
-        </p>
-      </div>
+            <span>Attempted {formatRelativeTime(evaluation.created_at)}</span>
+          </span>
+        }
+      />
 
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Your explanation</CardTitle>
+        <CardHeader>
+          <CardTitle>Your explanation</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="whitespace-pre-wrap text-sm leading-relaxed">{evaluation.explanation}</p>
+          <p className="whitespace-pre-wrap text-[17px] leading-relaxed">{evaluation.explanation}</p>
         </CardContent>
       </Card>
 
@@ -99,11 +98,11 @@ export default async function HistoryDetailPage({ params }: { params: { id: stri
 
       {turns.length > 0 && (
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">
+          <CardHeader>
+            <CardTitle>
               Interview transcript
               {evaluation.interview_status === 'active' && (
-                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                <span className="ml-2 text-[14px] font-normal text-muted-foreground">
                   (not completed)
                 </span>
               )}
@@ -147,22 +146,13 @@ export default async function HistoryDetailPage({ params }: { params: { id: stri
         <CounterexampleCard evaluationId={evaluation.id} stored={evaluation.counterexample} />
       )}
 
-      <div className="flex justify-between">
-        <Link
-          href="/history"
-          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
-        >
-          ← All history
-        </Link>
-        {evaluation.problem && (
-          <Link
-            href={`/problems/${evaluation.problem.slug}`}
-            className={cn(buttonVariants({ size: 'sm' }))}
-          >
-            Try again
+      {evaluation.problem && (
+        <div className="flex justify-end">
+          <Link href={`/problems/${evaluation.problem.slug}`} className={cn(buttonVariants())}>
+            Try this problem again
           </Link>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

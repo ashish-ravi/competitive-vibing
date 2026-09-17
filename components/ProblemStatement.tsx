@@ -1,63 +1,59 @@
 import ReactMarkdown from 'react-markdown';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
+import { topicLabel } from '@/lib/stats';
 import type { PublicProblem } from '@/lib/db';
 
 export function ProblemStatement({ problem }: { problem: PublicProblem }) {
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-bold tracking-tight">{problem.title}</h1>
+    <article className="space-y-6">
+      <header>
+        <div className="flex flex-wrap items-center gap-2.5 text-[14px] text-muted-foreground">
           <DifficultyBadge difficulty={problem.difficulty} />
+          <span>{problem.topics.map(topicLabel).join(' · ')}</span>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {problem.topics.map((topic) => (
-            <Badge key={topic} variant="secondary" className="font-normal">
-              {topic}
-            </Badge>
-          ))}
-        </div>
-      </div>
+        <h1 className="mt-3 text-[32px] font-semibold leading-[1.1] tracking-display md:text-[40px]">
+          {problem.title}
+        </h1>
+      </header>
 
-      <div className="prose prose-sm max-w-none text-foreground dark:prose-invert [&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-sm [&_p]:leading-relaxed">
+      <div className="prose max-w-none text-[17px] leading-relaxed text-foreground dark:prose-invert prose-p:my-3 prose-strong:font-semibold [&_code]:rounded-md [&_code]:bg-secondary [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[15px] [&_code]:font-normal [&_code]:before:content-none [&_code]:after:content-none">
         <ReactMarkdown>{problem.statement}</ReactMarkdown>
       </div>
 
       <div className="space-y-3">
         {problem.examples.map((example, i) => (
-          <Card key={i}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Example {i + 1}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1 font-mono text-sm">
-              <p className="break-words">
-                <span className="font-semibold text-muted-foreground">Input: </span>
-                {example.input}
+          <section key={i} className="rounded-2xl bg-card p-5">
+            <h2 className="text-[13px] font-semibold text-muted-foreground">Example {i + 1}</h2>
+            <dl className="mt-2 space-y-1.5 font-mono text-[14px] leading-relaxed">
+              <div className="flex gap-3">
+                <dt className="w-14 shrink-0 text-muted-foreground">Input</dt>
+                <dd className="min-w-0 break-words">{example.input}</dd>
+              </div>
+              <div className="flex gap-3">
+                <dt className="w-14 shrink-0 text-muted-foreground">Output</dt>
+                <dd className="min-w-0 break-words">{example.output}</dd>
+              </div>
+            </dl>
+            {example.explanation && (
+              <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground">
+                {example.explanation}
               </p>
-              <p className="break-words">
-                <span className="font-semibold text-muted-foreground">Output: </span>
-                {example.output}
-              </p>
-              {example.explanation && (
-                <p className="break-words font-sans text-muted-foreground">{example.explanation}</p>
-              )}
-            </CardContent>
-          </Card>
+            )}
+          </section>
         ))}
       </div>
 
-      <div>
-        <h2 className="mb-1.5 text-sm font-semibold">Constraints</h2>
-        <ul className="space-y-1 text-sm text-muted-foreground">
+      <section>
+        <h2 className="text-[15px] font-semibold">Constraints</h2>
+        <ul className="mt-2 space-y-1.5 text-[15px] leading-relaxed text-muted-foreground">
           {problem.constraints.map((c, i) => (
-            <li key={i} className="break-words font-mono">
-              • {c}
+            <li key={i} className="flex gap-2.5">
+              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/50" aria-hidden />
+              <span className="break-words font-mono text-[14px]">{c}</span>
             </li>
           ))}
         </ul>
-      </div>
-    </div>
+      </section>
+    </article>
   );
 }

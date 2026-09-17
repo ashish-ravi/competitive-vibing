@@ -3,21 +3,9 @@ import { cn } from '@/lib/utils';
 export type TurnResolution = 'addressed' | 'partially_addressed' | 'not_addressed';
 
 const RESOLUTION_CONFIG: Record<TurnResolution, { symbol: string; label: string; className: string }> = {
-  addressed: {
-    symbol: '✓',
-    label: 'Addressed',
-    className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-  },
-  partially_addressed: {
-    symbol: '~',
-    label: 'Partially addressed',
-    className: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-  },
-  not_addressed: {
-    symbol: '✗',
-    label: 'Not addressed',
-    className: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300',
-  },
+  addressed: { symbol: '✓', label: 'Addressed', className: 'bg-ease text-white' },
+  partially_addressed: { symbol: '~', label: 'Partially addressed', className: 'bg-grind text-white' },
+  not_addressed: { symbol: '✕', label: 'Not addressed', className: 'bg-boss text-white' },
 };
 
 interface InterviewTurnProps {
@@ -26,35 +14,37 @@ interface InterviewTurnProps {
   assessment?: { resolution: TurnResolution; note: string };
 }
 
+/** Messages-style exchange: interviewer on the left in grey, you on the right in the accent. */
 export function InterviewTurn({ question, answer, assessment }: InterviewTurnProps) {
   return (
     <div className="space-y-2">
       <div className="flex justify-start">
-        <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-muted px-3.5 py-2.5 text-sm">
+        <p className="max-w-[85%] rounded-[18px] rounded-bl-[4px] bg-secondary px-4 py-2.5 text-[15px] leading-relaxed">
           {question}
-        </div>
+        </p>
       </div>
       {answer && (
         <div className="flex justify-end">
-          <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-primary px-3.5 py-2.5 text-sm text-primary-foreground">
+          <p className="max-w-[85%] rounded-[18px] rounded-br-[4px] bg-primary px-4 py-2.5 text-[15px] leading-relaxed text-primary-foreground">
             {answer}
-          </div>
+          </p>
         </div>
       )}
       {assessment && (
         <div className="flex justify-end">
-          <div className="flex max-w-[85%] items-start gap-1.5 text-xs text-muted-foreground">
+          <p className="flex max-w-[85%] items-start gap-2 text-[13px] leading-relaxed text-muted-foreground">
             <span
               className={cn(
-                'inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
+                'mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
                 RESOLUTION_CONFIG[assessment.resolution].className
               )}
-              title={RESOLUTION_CONFIG[assessment.resolution].label}
+              role="img"
+              aria-label={RESOLUTION_CONFIG[assessment.resolution].label}
             >
               {RESOLUTION_CONFIG[assessment.resolution].symbol}
             </span>
             <span>{assessment.note}</span>
-          </div>
+          </p>
         </div>
       )}
     </div>

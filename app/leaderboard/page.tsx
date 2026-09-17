@@ -2,13 +2,26 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { getLeaderboard, getLeaderboardOptIn, levelFromXp } from '@/lib/stats';
 import { LeaderboardToggle } from '@/components/LeaderboardToggle';
+import { PageHeader } from '@/components/PageHeader';
 import { UserAvatar } from '@/components/UserAvatar';
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+/** Top three ranks get a filled marker; everyone else a plain number. */
+function RankMarker({ rank }: { rank: number }) {
+  const top = rank <= 3;
+  return (
+    <span
+      className={cn(
+        'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[14px] font-semibold tabular-nums',
+        top ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+      )}
+    >
+      {rank}
+    </span>
+  );
+}
 
 export default async function LeaderboardPage() {
   const session = await auth();
@@ -20,55 +33,51 @@ export default async function LeaderboardPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 pb-10">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="prompt-heading font-display text-2xl font-bold tracking-tight">
-            leaderboard
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ranked by XP. Opt-in only — join when you&apos;re ready to be seen.
-          </p>
-        </div>
-        <LeaderboardToggle optedIn={optedIn} />
-      </div>
+    <div className="mx-auto max-w-2xl space-y-8">
+      <PageHeader
+        title="Leaderboard"
+        description="Ranked by XP. Only people who opt in are listed."
+        aside={<LeaderboardToggle optedIn={optedIn} />}
+      />
 
-      <Card>
-        <CardContent className="divide-y pt-2">
-          {rows.length === 0 && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Nobody&apos;s on the board yet. Flip the switch above and claim rank #1.
-            </p>
-          )}
-          {rows.map((row) => {
+      <div className="overflow-hidden rounded-2xl bg-card">
+        {rows.length === 0 && (
+          <p className="px-6 py-12 text-center text-[15px] leading-relaxed text-muted-foreground">
+            Nobody is on the board yet. Turn on the switch above to take the first spot.
+          </p>
+        )}
+        <ol>
+          {rows.map((row, i) => {
             const isYou = row.userId === session.user.id;
             return (
-              <div
+              <li
                 key={row.userId}
                 className={cn(
-                  'flex min-h-[52px] items-center gap-3 py-2.5',
-                  isYou && '-mx-4 rounded-md bg-primary/5 px-4'
+                  'flex min-h-[64px] items-center gap-4 px-5 py-3',
+                  i > 0 && 'border-t border-border',
+                  isYou && 'bg-primary/[0.06]'
                 )}
               >
-                <span className="w-8 text-center font-mono text-sm tabular-nums text-muted-foreground">
-                  {MEDALS[row.rank - 1] ?? row.rank}
-                </span>
-                <UserAvatar name={row.name} image={row.avatarUrl} size={32} />
+                <RankMarker rank={row.rank} />
+                <UserAvatar name={row.name} image={row.avatarUrl} size={40} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">
+                  <span className="block truncate text-[17px] font-medium tracking-title">
                     {row.name}
-                    {isYou && <span className="ml-1.5 text-xs text-primary">(you)</span>}
+                    {isYou && <span className="ml-1.5 text-[14px] font-normal text-muted-foreground">(you)</span>}
                   </span>
-                  <span className="block font-mono text-xs text-muted-foreground">
-                    lvl {levelFromXp(row.xp).level} · {row.solved} solved
+                  <span className="block text-[13px] text-muted-foreground">
+                    Level {levelFromXp(row.xp).level} · {row.solved} solved
                   </span>
                 </span>
-                <span className="font-mono text-sm font-semibold tabular-nums">{row.xp} xp</span>
-              </div>
+                <span className="text-[17px] font-semibold tabular-nums tracking-title">
+                  {row.xp}
+                  <span className="ml-1 text-[13px] font-normal text-muted-foreground">XP</span>
+                </span>
+              </li>
             );
           })}
-        </CardContent>
-      </Card>
+        </ol>
+      </div>
     </div>
   );
 }

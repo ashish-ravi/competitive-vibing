@@ -1,6 +1,6 @@
 import Link from 'next/link';
+import { Chevron } from '@/components/ChevronLink';
 import { ProgressRing } from '@/components/ProgressRing';
-import { Reveal } from '@/components/Reveal';
 import type { RoadmapStage, RoadmapTopic } from '@/lib/roadmap';
 import { cn } from '@/lib/utils';
 
@@ -16,61 +16,42 @@ function StageMarker({
   current: boolean;
 }) {
   return (
-    <span className="absolute left-0 top-0 flex h-11 w-11 items-center justify-center" aria-hidden>
-      {current && (
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/25" />
+    <span
+      className={cn(
+        'absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full text-[15px] font-semibold tabular-nums',
+        complete
+          ? 'bg-ease text-white'
+          : current
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-card text-muted-foreground ring-1 ring-inset ring-border'
       )}
-      <span
-        className={cn(
-          'relative flex h-11 w-11 items-center justify-center rounded-full border-2 font-mono text-sm font-semibold',
-          complete
-            ? 'border-ease bg-ease/10 text-ease'
-            : current
-              ? 'border-primary bg-background text-primary shadow-[0_0_20px_-4px_hsl(var(--primary)/0.6)]'
-              : 'border-border bg-background text-muted-foreground'
-        )}
-      >
-        {complete ? (
-          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m5 13 4 4L19 7" />
-          </svg>
-        ) : (
-          level
-        )}
-      </span>
+      aria-hidden
+    >
+      {complete ? (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m5 13 4 4L19 7" />
+        </svg>
+      ) : (
+        level
+      )}
     </span>
   );
 }
 
-function TopicTile({ item, dimmed }: { item: RoadmapTopic; dimmed: boolean }) {
-  const complete = item.solved >= item.total;
+function TopicTile({ item }: { item: RoadmapTopic }) {
   return (
     <Link
       href={`/?topic=${encodeURIComponent(item.topic)}&from=explore`}
-      className={cn(
-        'group flex items-center gap-3.5 rounded-lg border bg-card p-4 transition-all duration-200',
-        'hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        complete && 'border-ease/40',
-        dimmed && 'opacity-80'
-      )}
+      className="tile-interactive group flex items-center gap-4 p-4"
     >
-      <ProgressRing value={item.total ? item.solved / item.total : 0} />
+      <ProgressRing value={item.total ? item.solved / item.total : 0} size={46} />
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-display text-[15px] font-bold">{item.label}</span>
-        <span className="mt-0.5 block font-mono text-xs text-primary">#{item.topic}</span>
-      </span>
-      <span className="flex flex-col items-end gap-1">
-        <span className="font-mono text-xs tabular-nums text-muted-foreground">
-          {item.solved}/{item.total}
-        </span>
-        <span
-          className="translate-x-1 font-mono text-sm text-primary opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100"
-          aria-hidden
-        >
-          →
+        <span className="block truncate text-[17px] font-semibold tracking-title">{item.label}</span>
+        <span className="mt-0.5 block text-[14px] text-muted-foreground">
+          {item.solved} of {item.total} solved
         </span>
       </span>
+      <Chevron className="h-5 w-5 shrink-0 text-muted-foreground/60 transition-colors group-hover:text-primary" />
     </Link>
   );
 }
@@ -85,35 +66,34 @@ export function Roadmap({
   return (
     <div className="relative">
       {/* spine */}
-      <div
-        className="absolute bottom-6 left-[21px] top-6 w-0.5 rounded-full bg-gradient-to-b from-primary via-glow/50 to-border"
-        aria-hidden
-      />
-      {stages.map((stage, i) => {
+      <div className="absolute bottom-8 left-[19px] top-10 w-0.5 bg-border" aria-hidden />
+      {stages.map((stage) => {
         const current = stage.level === currentLevel;
         return (
-          <Reveal key={stage.level} delay={Math.min(i * 90, 500)}>
-            <section className="relative pb-10 pl-16 last:pb-0">
-              <StageMarker level={stage.level} complete={stage.complete} current={current} />
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pt-1.5">
-                <h2 className="font-display text-lg font-bold tracking-tight">{stage.title}</h2>
-                {current && (
-                  <span className="rounded-full bg-primary/15 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-primary">
-                    you are here
-                  </span>
-                )}
-                {stage.complete && (
-                  <span className="font-mono text-[11px] text-ease">cleared</span>
-                )}
-              </div>
-              <p className="mt-1 max-w-xl text-sm text-muted-foreground">{stage.blurb}</p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {stage.items.map((item) => (
-                  <TopicTile key={item.topic} item={item} dimmed={stage.level > currentLevel} />
-                ))}
-              </div>
-            </section>
-          </Reveal>
+          <section key={stage.level} className="relative pb-12 pl-14 last:pb-0 sm:pl-16">
+            <StageMarker level={stage.level} complete={stage.complete} current={current} />
+            <div className="flex min-h-[40px] flex-wrap items-center gap-x-3 gap-y-1">
+              <h2 className="text-[22px] font-semibold tracking-title">{stage.title}</h2>
+              {current && (
+                <span className="rounded-full bg-primary/[0.12] px-2.5 py-0.5 text-[12px] font-semibold text-primary">
+                  You are here
+                </span>
+              )}
+              {stage.complete && (
+                <span className="rounded-full bg-ease/[0.12] px-2.5 py-0.5 text-[12px] font-semibold text-ease">
+                  Complete
+                </span>
+              )}
+            </div>
+            <p className="mt-1 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
+              {stage.blurb}
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {stage.items.map((item) => (
+                <TopicTile key={item.topic} item={item} />
+              ))}
+            </div>
+          </section>
         );
       })}
     </div>

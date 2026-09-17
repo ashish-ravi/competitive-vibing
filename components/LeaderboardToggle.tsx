@@ -4,36 +4,37 @@ import { useTransition } from 'react';
 import { toggleLeaderboardAction } from '@/app/actions';
 import { cn } from '@/lib/utils';
 
+/** A labeled switch in the iOS idiom: label on the left, green when on. */
 export function LeaderboardToggle({ optedIn }: { optedIn: boolean }) {
   const [pending, startTransition] = useTransition();
 
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={optedIn}
-      disabled={pending}
-      onClick={() => startTransition(() => toggleLeaderboardAction(!optedIn))}
+    <label
       className={cn(
-        'inline-flex min-h-[44px] items-center gap-2.5 rounded-md border px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60',
-        optedIn ? 'border-primary/50 bg-primary/10' : 'bg-card hover:bg-accent'
+        'flex min-h-[44px] cursor-pointer items-center gap-3 text-[15px] font-medium',
+        pending && 'opacity-60'
       )}
     >
-      <span
+      <span>{pending ? 'Saving…' : 'Show me on the leaderboard'}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={optedIn}
+        disabled={pending}
+        onClick={() => startTransition(() => toggleLeaderboardAction(!optedIn))}
         className={cn(
-          'relative h-5 w-9 rounded-full transition-colors',
-          optedIn ? 'bg-primary' : 'bg-muted-foreground/30'
+          'relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+          optedIn ? 'bg-[#34c759]' : 'bg-black/[0.16] dark:bg-white/[0.24]'
         )}
-        aria-hidden
       >
         <span
           className={cn(
-            'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all',
-            optedIn ? 'left-[18px]' : 'left-0.5'
+            'absolute left-0 top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,0.15),0_1px_1px_rgba(0,0,0,0.16)] transition-transform duration-200',
+            optedIn ? 'translate-x-[22px]' : 'translate-x-[2px]'
           )}
+          aria-hidden
         />
-      </span>
-      {pending ? 'Saving…' : optedIn ? 'On the leaderboard' : 'Join the leaderboard'}
-    </button>
+      </button>
+    </label>
   );
 }

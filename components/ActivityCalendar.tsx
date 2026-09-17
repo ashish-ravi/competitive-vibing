@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { Chevron } from '@/components/ChevronLink';
 import { cn } from '@/lib/utils';
 
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -10,9 +11,9 @@ function pad(n: number): string {
 }
 
 /**
- * Monthly activity calendar: a dot marks days with at least one SOLVE
- * (correct verdict) — attempts or plain logins don't count. Today is the
- * filled circle. Dates are UTC to match streak accounting.
+ * Monthly activity calendar. A day is filled green when at least one
+ * explanation was graded correct on it — attempts and plain logins don't
+ * count. Today is outlined in the accent. Dates are UTC to match streaks.
  */
 export function ActivityCalendar({ solvedDays }: { solvedDays: string[] }) {
   const solved = useMemo(() => new Set(solvedDays), [solvedDays]);
@@ -40,31 +41,31 @@ export function ActivityCalendar({ solvedDays }: { solvedDays: string[] }) {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <p className="font-mono text-xs font-medium">{monthLabel}</p>
-        <div className="flex gap-1">
+        <p className="text-[15px] font-semibold">{monthLabel}</p>
+        <div className="-mr-2 flex">
           <button
             type="button"
             onClick={() => shift(-1)}
             aria-label="Previous month"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary/[0.08]"
           >
-            ‹
+            <Chevron direction="left" className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => shift(1)}
             disabled={atCurrentMonth}
             aria-label="Next month"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary/[0.08] disabled:text-muted-foreground/50 disabled:hover:bg-transparent"
           >
-            ›
+            <Chevron className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <div className="mt-2 grid grid-cols-7 gap-y-0.5 text-center">
+      <div className="mt-3 grid grid-cols-7 gap-y-1 text-center">
         {DOW.map((d, i) => (
-          <span key={i} className="font-mono text-[10px] text-muted-foreground/70">
+          <span key={i} className="text-[11px] font-medium text-muted-foreground">
             {d}
           </span>
         ))}
@@ -77,24 +78,20 @@ export function ActivityCalendar({ solvedDays }: { solvedDays: string[] }) {
           const isToday = dateStr === todayStr;
           const isSolved = solved.has(dateStr);
           return (
-            <span key={day} className="flex h-8 flex-col items-center justify-center gap-0.5">
+            <span key={day} className="flex h-8 items-center justify-center">
               <span
                 className={cn(
-                  'flex h-6 w-6 items-center justify-center rounded-full font-mono text-[11px] tabular-nums',
-                  isToday
-                    ? 'bg-primary font-semibold text-primary-foreground'
-                    : isSolved
-                      ? 'font-semibold text-ease'
-                      : 'text-muted-foreground'
+                  'flex h-7 w-7 items-center justify-center rounded-full text-[13px] tabular-nums',
+                  isSolved
+                    ? 'bg-ease font-semibold text-white'
+                    : isToday
+                      ? 'font-semibold text-primary ring-[1.5px] ring-primary'
+                      : 'text-foreground/80'
                 )}
                 title={isSolved ? `Solved on ${dateStr}` : dateStr}
               >
                 {day}
               </span>
-              <span
-                className={cn('h-1 w-1 rounded-full', isSolved ? 'bg-ease' : 'bg-transparent')}
-                aria-hidden
-              />
             </span>
           );
         })}

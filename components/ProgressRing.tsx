@@ -1,4 +1,3 @@
-import { useId } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ProgressRingProps {
@@ -8,10 +7,9 @@ interface ProgressRingProps {
   className?: string;
 }
 
-/** Circular progress with the brand gradient; a check when complete. */
+/** Circular progress in the accent color; green with a check once complete. */
 export function ProgressRing({ value, size = 44, className }: ProgressRingProps) {
-  const gradientId = useId();
-  const stroke = 3.5;
+  const stroke = 4;
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const clamped = Math.min(1, Math.max(0, value));
@@ -24,18 +22,12 @@ export function ProgressRing({ value, size = 44, className }: ProgressRingProps)
       aria-hidden
     >
       <svg width={size} height={size} className="-rotate-90">
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(var(--glow))" />
-          </linearGradient>
-        </defs>
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="hsl(var(--muted))"
+          stroke="hsl(var(--secondary))"
           strokeWidth={stroke}
         />
         <circle
@@ -43,7 +35,7 @@ export function ProgressRing({ value, size = 44, className }: ProgressRingProps)
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={complete ? 'hsl(var(--ease))' : `url(#${gradientId})`}
+          stroke={complete ? 'hsl(var(--ease))' : 'hsl(var(--primary))'}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -51,7 +43,7 @@ export function ProgressRing({ value, size = 44, className }: ProgressRingProps)
           className="transition-[stroke-dashoffset] duration-700"
         />
       </svg>
-      <span className="absolute font-mono text-[10px] font-semibold tabular-nums">
+      <span className="absolute text-[11px] font-semibold tabular-nums">
         {complete ? (
           <svg className="h-4 w-4 text-ease" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="m5 13 4 4L19 7" />

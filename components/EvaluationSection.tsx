@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ApproachReveal } from '@/components/ApproachReveal';
+import { Chevron } from '@/components/ChevronLink';
 import { CounterexampleCard } from '@/components/CounterexampleCard';
 import { EvaluationResult, type PartialEvaluation } from '@/components/EvaluationResult';
 import { ExplanationInput } from '@/components/ExplanationInput';
 import { InterviewPanel } from '@/components/InterviewPanel';
+import { Notice } from '@/components/Notice';
 import { RateLimitNotice } from '@/components/RateLimitNotice';
 import { readNdjsonStream } from '@/lib/stream';
 import { cn } from '@/lib/utils';
@@ -114,7 +116,7 @@ export function EvaluationSection({
         setPhase('error');
       }
     } catch {
-      setError('Network hiccup — the evaluation did not complete. Please try again.');
+      setError('The evaluation did not complete. Check your connection and try again.');
       setPhase('error');
     }
   }
@@ -134,14 +136,17 @@ export function EvaluationSection({
     evaluation.evaluationId &&
     (evaluation.verdict === 'partial' || evaluation.verdict === 'incorrect');
 
-  return (
-    <div className="space-y-4">
-      {attempts > 0 && (
-        <p className="text-xs text-muted-foreground">
-          {attempts} previous attempt{attempts === 1 ? '' : 's'} on this problem
-        </p>
-      )}
+  const retryNotice = error ? (
+    <Notice tone="error">
+      {error}{' '}
+      <button onClick={evaluate} className="font-semibold text-primary hover:underline">
+        Try again
+      </button>
+    </Notice>
+  ) : null;
 
+  return (
+    <div className="space-y-5">
       <ExplanationInput
         value={explanation}
         onChange={handleEdit}
@@ -149,31 +154,21 @@ export function EvaluationSection({
         disabled={phase === 'streaming'}
       />
 
+      {attempts > 0 && phase === 'idle' && (
+        <p className="text-[13px] text-muted-foreground">
+          {attempts} previous attempt{attempts === 1 ? '' : 's'} on this problem.
+        </p>
+      )}
+
       {retryAfter !== null && <RateLimitNotice retryAfter={retryAfter} />}
 
-      {phase === 'error' && !hasPartialContent && error && (
-        <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-          {error}{' '}
-          <button onClick={evaluate} className="font-semibold underline underline-offset-2">
-            Try again
-          </button>
-        </div>
-      )}
+      {phase === 'error' && !hasPartialContent && retryNotice}
 
       {showResult && (
         <EvaluationResult
           evaluation={evaluation}
           streaming={phase === 'streaming'}
-          footer={
-            phase === 'error' && hasPartialContent && error ? (
-              <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-                {error}{' '}
-                <button onClick={evaluate} className="font-semibold underline underline-offset-2">
-                  Try again
-                </button>
-              </div>
-            ) : undefined
-          }
+          footer={phase === 'error' && hasPartialContent ? retryNotice : undefined}
         />
       )}
 
@@ -196,7 +191,7 @@ export function EvaluationSection({
       )}
 
       {phase === 'complete' && (
-        <>
+        <div className="space-y-4 pt-2">
           {nextProblem && (
             <Link
               href={`/problems/${nextProblem.slug}`}
@@ -205,14 +200,14 @@ export function EvaluationSection({
                   variant: evaluation.verdict === 'correct' ? 'default' : 'outline',
                   size: 'lg',
                 }),
-                'w-full justify-between md:w-auto md:min-w-[280px]'
+                'w-full justify-between md:w-auto md:min-w-[300px]'
               )}
             >
               <span className="truncate">
                 {evaluation.verdict === 'correct' ? 'Next: ' : 'Try next: '}
                 {nextProblem.title}
               </span>
-              <span aria-hidden>→</span>
+              <Chevron className="h-[1em] w-[1em] shrink-0" />
             </Link>
           )}
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -221,7 +216,7 @@ export function EvaluationSection({
               Start a fresh attempt
             </Button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

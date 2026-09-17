@@ -3,63 +3,65 @@
 @tailwind utilities;
 
 /*
- * Competitive Vibing — "terminal dusk"
- * Deep blue-charcoal surfaces (the 2am editor), electric-violet brand accent,
- * ice-cyan for glow moments. Green/amber/rose stay reserved for what they
- * mean: easy/medium/hard and correct/partial/incorrect.
+ * Competitive Vibing — visual system
+ *
+ * Grouped surfaces in the Apple idiom: a soft grey page with white tiles in
+ * light mode, true black with graphite tiles in dark. One accent (system
+ * blue) carries every interactive element. Green, orange and red are
+ * reserved for what they mean everywhere in the app: easy/medium/hard and
+ * correct/partial/needs work. All text colors meet 4.5:1 on the surface
+ * they sit on (secondary on tile: 5.4:1 light, 7.3:1 dark).
  */
 
 @layer base {
   :root {
-    --background: 228 36% 98%;
-    --foreground: 230 30% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 230 30% 11%;
-    --primary: 266 78% 54%;
+    --background: 240 11% 96%; /* #f5f5f7 grouped page */
+    --foreground: 240 3% 12%; /* #1d1d1f label */
+    --card: 0 0% 100%; /* white tile */
+    --card-foreground: 240 3% 12%;
+    --primary: 210 100% 45%; /* #0071e3 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 228 28% 94%;
-    --secondary-foreground: 230 24% 18%;
-    --muted: 228 28% 94%;
-    --muted-foreground: 230 12% 44%;
-    --accent: 228 28% 93%;
-    --accent-foreground: 230 24% 16%;
-    --destructive: 350 78% 48%;
+    --secondary: 240 5% 91%; /* #e8e8ed fill */
+    --secondary-foreground: 240 3% 12%;
+    --muted: 240 5% 91%;
+    --muted-foreground: 240 2% 44%; /* #6e6e73 secondary label */
+    --accent: 240 5% 93%;
+    --accent-foreground: 240 3% 12%;
+    --destructive: 354 100% 42%; /* #d70015 */
     --destructive-foreground: 0 0% 100%;
-    --border: 228 20% 88%;
-    --input: 228 20% 85%;
-    --ring: 266 78% 54%;
-    --radius: 0.5rem;
+    --border: 240 6% 83%; /* #d2d2d7 separator */
+    --input: 240 5% 91%;
+    --ring: 210 100% 45%;
+    --radius: 12px;
 
-    /* brand extras */
-    --glow: 192 90% 42%;
-    --ease: 152 55% 38%;
-    --grind: 38 92% 44%;
-    --boss: 350 78% 52%;
+    /* semantic: difficulty + verdict */
+    --ease: 135 60% 30%;
+    --grind: 20 100% 40%;
+    --boss: 354 100% 42%;
   }
 
   .dark {
-    --background: 224 28% 6%;
-    --foreground: 226 30% 92%;
-    --card: 224 25% 9%;
-    --card-foreground: 226 30% 92%;
-    --primary: 264 92% 70%;
-    --primary-foreground: 264 60% 10%;
-    --secondary: 224 20% 14%;
-    --secondary-foreground: 226 24% 86%;
-    --muted: 224 20% 13%;
-    --muted-foreground: 226 12% 60%;
-    --accent: 224 20% 15%;
-    --accent-foreground: 226 24% 88%;
-    --destructive: 350 80% 62%;
-    --destructive-foreground: 350 60% 10%;
-    --border: 224 18% 17%;
-    --input: 224 18% 19%;
-    --ring: 264 92% 70%;
+    --background: 0 0% 0%;
+    --foreground: 240 11% 96%; /* #f5f5f7 */
+    --card: 240 3% 12%; /* #1d1d1f elevated tile */
+    --card-foreground: 240 11% 96%;
+    --primary: 209 100% 58%; /* #2997ff */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 2% 18%; /* #2c2c2e */
+    --secondary-foreground: 240 11% 96%;
+    --muted: 240 2% 18%;
+    --muted-foreground: 240 3% 64%; /* #a1a1a6 */
+    --accent: 240 2% 20%;
+    --accent-foreground: 240 11% 96%;
+    --destructive: 3 100% 61%; /* #ff453a */
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 2% 26%; /* #424245 */
+    --input: 240 2% 18%;
+    --ring: 209 100% 58%;
 
-    --glow: 190 95% 68%;
-    --ease: 152 60% 52%;
-    --grind: 40 95% 60%;
-    --boss: 351 90% 68%;
+    --ease: 135 64% 50%;
+    --grind: 37 100% 52%;
+    --boss: 3 100% 61%;
   }
 }
 
@@ -67,48 +69,46 @@
   * {
     @apply border-border;
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: 'ss01', 'cv05';
+    text-rendering: optimizeLegibility;
   }
   ::selection {
-    background: hsl(var(--primary) / 0.25);
+    background: hsl(var(--primary) / 0.22);
   }
 }
 
 @layer components {
-  /* Signature: headings carry a terminal prompt glyph. */
-  .prompt-heading::before {
-    content: '> ';
-    color: hsl(var(--primary));
-    font-family: var(--font-mono);
-    font-weight: 600;
+  /*
+   * Clickable tile. Light: lifts on a soft shadow. Dark: shadows vanish on
+   * black, so the surface itself brightens to the elevated grey and picks up
+   * a hairline — the same cue macOS uses for a raised dark surface.
+   */
+  .tile-interactive {
+    @apply rounded-2xl bg-card transition-[transform,box-shadow,background-color] duration-200;
+    @apply hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)] active:scale-[0.99];
+    @apply dark:hover:bg-[#2c2c2e] dark:hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_12px_32px_-12px_rgba(0,0,0,0.9)];
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
   }
-
-  /* The dotted backdrop is global — see components/DotGrid.tsx. */
 }
 
 @layer utilities {
-  .animate-fade-up {
-    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Apple display tracking: large sizes tighten, small sizes stay neutral. */
+  .tracking-display {
+    letter-spacing: -0.02em;
   }
+  .tracking-title {
+    letter-spacing: -0.012em;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .animate-fade-up,
     .animate-slide-in,
     .animate-backdrop-in,
-    .animate-ping {
+    .animate-rise {
       animation: none !important;
     }
-  }
-}
-
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

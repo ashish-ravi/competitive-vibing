@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Chevron } from '@/components/ChevronLink';
 import { DifficultyTabs, type DifficultyFilter } from '@/components/DifficultyTabs';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
+import { StatusGlyph } from '@/components/StatusGlyph';
 import { topicLabel, type ProblemStatus } from '@/lib/stats';
 import type { ProblemListItem } from '@/lib/db';
 import { cn } from '@/lib/utils';
@@ -14,25 +16,12 @@ interface ProblemBrowserProps {
   statuses: Record<string, ProblemStatus>;
 }
 
-function StatusGlyph({ status }: { status: ProblemStatus | undefined }) {
-  if (status?.status === 'solved') {
-    return (
-      <span className="font-mono text-sm font-semibold text-ease" title="Solved">
-        ✓
-      </span>
-    );
-  }
-  if (status?.status === 'attempted') {
-    return (
-      <span className="font-mono text-sm font-semibold text-grind" title="Attempted">
-        ~
-      </span>
-    );
-  }
+function SearchIcon({ className }: { className?: string }) {
   return (
-    <span className="font-mono text-sm text-muted-foreground/50" title="Not attempted">
-      ·
-    </span>
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
   );
 }
 
@@ -96,88 +85,96 @@ export function ProblemBrowser({ problems, statuses }: ProblemBrowserProps) {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <DifficultyTabs value={difficulty} onChange={(d) => setParams({ difficulty: d })} />
-        <p className="font-mono text-xs text-muted-foreground">
-          {solvedInScope}/{inTopic.length} solved
+        <p className="text-[14px] tabular-nums text-muted-foreground">
+          {solvedInScope} of {inTopic.length} solved
         </p>
       </div>
 
-      <input
-        type="search"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search problems…"
-        aria-label="Search problems"
-        className="h-11 w-full rounded-md border border-input bg-card px-3 font-mono text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
+      <label className="relative block">
+        <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search problems"
+          aria-label="Search problems"
+          className="h-11 w-full rounded-xl bg-card pl-11 pr-4 text-[17px] text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/25"
+        />
+      </label>
 
       {!showTable ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {topics.map((t, i) => (
-            <button
-              key={t.topic}
-              onClick={() => setParams({ topic: t.topic })}
-              className="animate-fade-up rounded-lg border bg-card p-4 text-left transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              style={{ animationDelay: `${Math.min(i * 45, 500)}ms` }}
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="font-display text-[15px] font-bold">{t.label}</span>
-                <span className="font-mono text-xs text-muted-foreground">
-                  {t.solved}/{t.total}
-                </span>
-              </div>
-              <span className="mt-0.5 block font-mono text-xs text-primary">#{t.topic}</span>
-              <div className="mt-3 h-1 overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-primary to-glow transition-all"
-                  style={{ width: `${t.total ? (t.solved / t.total) * 100 : 0}%` }}
-                />
-              </div>
-            </button>
-          ))}
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {topics.map((t) => {
+            const pct = t.total ? Math.round((t.solved / t.total) * 100) : 0;
+            return (
+              <li key={t.topic}>
+                <button
+                  onClick={() => setParams({ topic: t.topic })}
+                  className="tile-interactive group flex w-full items-center gap-4 p-5 text-left"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[17px] font-semibold tracking-title">
+                      {t.label}
+                    </span>
+                    <span className="mt-0.5 block text-[14px] text-muted-foreground">
+                      {t.solved} of {t.total} solved
+                    </span>
+                    <span className="mt-3 block h-1 overflow-hidden rounded-full bg-secondary">
+                      <span
+                        className={cn('block h-full rounded-full', pct >= 100 ? 'bg-ease' : 'bg-primary')}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </span>
+                  </span>
+                  <Chevron className="h-5 w-5 shrink-0 text-muted-foreground/60 transition-colors group-hover:text-primary" />
+                </button>
+              </li>
+            );
+          })}
           {topics.length === 0 && (
-            <p className="col-span-full rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">
-              No problems here yet. Run{' '}
-              <code className="rounded bg-muted px-1.5 py-0.5 font-mono">npm run import</code> to
-              build the problem bank.
-            </p>
+            <li className="col-span-full rounded-2xl bg-card p-8 text-center text-[15px] text-muted-foreground">
+              No problems yet. Run{' '}
+              <code className="rounded-md bg-secondary px-1.5 py-0.5 font-mono text-[14px]">npm run import</code>{' '}
+              to build the problem bank.
+            </li>
           )}
-        </div>
+        </ul>
       ) : (
-        <div className="overflow-hidden rounded-lg border bg-card">
-          <div className="border-b px-4 py-2.5">
-            <p className="font-mono text-xs text-muted-foreground">
-              {searching ? (
-                <>
-                  {topic && <>#{topic} · </>}“{search.trim()}” · {tableRows.length} match
-                  {tableRows.length === 1 ? '' : 'es'}
-                </>
-              ) : (
-                <>
-                  #{topic} · {tableRows.length} problem{tableRows.length === 1 ? '' : 's'}
-                </>
-              )}
-            </p>
-          </div>
-          <ul className="divide-y">
-            {tableRows.map((p) => {
+        <div className="overflow-hidden rounded-2xl bg-card">
+          <p className="px-5 pb-2 pt-4 text-[13px] text-muted-foreground">
+            {searching ? (
+              <>
+                {tableRows.length} result{tableRows.length === 1 ? '' : 's'} for “{search.trim()}”
+                {topic && <> in {topicLabel(topic)}</>}
+              </>
+            ) : (
+              <>
+                {tableRows.length} problem{tableRows.length === 1 ? '' : 's'}
+              </>
+            )}
+          </p>
+          <ul>
+            {tableRows.map((p, i) => {
               const status = statuses[p.id];
               return (
-                <li key={p.id}>
+                <li key={p.id} className={cn(i > 0 && 'border-t border-border')}>
                   <Link
                     href={`/problems/${p.slug}`}
-                    className="flex min-h-[52px] items-center gap-3 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                    className="flex min-h-[60px] items-center gap-4 px-5 py-3 transition-colors hover:bg-black/[0.025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring dark:hover:bg-white/[0.04]"
                   >
                     <StatusGlyph status={status} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">{p.title}</span>
-                      <span className="block truncate font-mono text-xs text-muted-foreground">
-                        {p.topics.map((t) => `#${t}`).join(' ')}
+                      <span className="block truncate text-[17px] font-medium tracking-title">
+                        {p.title}
+                      </span>
+                      <span className="block truncate text-[13px] text-muted-foreground">
+                        {p.topics.map(topicLabel).join(' · ')}
                       </span>
                     </span>
                     {status && (
                       <span
                         className={cn(
-                          'hidden font-mono text-xs tabular-nums sm:inline',
+                          'hidden text-[14px] tabular-nums sm:inline',
                           status.status === 'solved' ? 'text-ease' : 'text-muted-foreground'
                         )}
                       >
@@ -185,12 +182,13 @@ export function ProblemBrowser({ problems, statuses }: ProblemBrowserProps) {
                       </span>
                     )}
                     <DifficultyBadge difficulty={p.difficulty} />
+                    <Chevron className="hidden h-4 w-4 text-muted-foreground/60 sm:block" />
                   </Link>
                 </li>
               );
             })}
             {tableRows.length === 0 && (
-              <li className="px-4 py-8 text-center text-sm text-muted-foreground">
+              <li className="px-5 py-10 text-center text-[15px] text-muted-foreground">
                 Nothing matches. Try another search or difficulty.
               </li>
             )}

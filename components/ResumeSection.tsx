@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { Chevron } from '@/components/ChevronLink';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { VerdictBadge } from '@/components/VerdictBadge';
+import { topicLabel } from '@/lib/stats';
 import { formatRelativeTime } from '@/lib/utils';
 import type { ResumeItem } from '@/lib/stats';
 
@@ -9,39 +11,39 @@ export function ResumeSection({ items }: { items: ResumeItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="space-y-2">
-      <h2 className="prompt-heading font-display text-sm font-bold lowercase tracking-tight">
-        resume
+    <section aria-labelledby="resume-heading">
+      <h2 id="resume-heading" className="text-[22px] font-semibold tracking-title">
+        Pick up where you left off
       </h2>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-3 grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
         {items.map((item) => (
-          <Link
-            key={`${item.kind}-${item.slug}`}
-            href={`/problems/${item.slug}`}
-            className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground">
-                {item.kind === 'continue' ? 'continue where you left off' : 'up next'}
+          <li key={`${item.kind}-${item.slug}`}>
+            <Link
+              href={`/problems/${item.slug}`}
+              className="tile-interactive group flex h-full items-center gap-4 p-5"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13px] font-medium text-muted-foreground">
+                  {item.kind === 'continue' ? 'Continue' : 'Up next'}
+                  {item.attemptedAt && <> · {formatRelativeTime(item.attemptedAt)}</>}
+                </span>
+                <span className="mt-1 block truncate text-[17px] font-semibold tracking-title">
+                  {item.title}
+                </span>
+                <span className="mt-2 flex items-center gap-2 text-[13px] text-muted-foreground">
+                  {item.kind === 'continue' && item.verdict ? (
+                    <VerdictBadge verdict={item.verdict} className="shrink-0 whitespace-nowrap" />
+                  ) : (
+                    <DifficultyBadge difficulty={item.difficulty} />
+                  )}
+                  <span className="truncate">{topicLabel(item.topic)}</span>
+                </span>
               </span>
-              {item.kind === 'continue' && item.verdict ? (
-                <VerdictBadge verdict={item.verdict} />
-              ) : (
-                <DifficultyBadge difficulty={item.difficulty} />
-              )}
-            </div>
-            <p className="mt-2 truncate font-display text-[15px] font-bold">{item.title}</p>
-            <p className="mt-0.5 flex items-center justify-between font-mono text-xs text-muted-foreground">
-              <span>#{item.topic}</span>
-              {item.attemptedAt && <span>{formatRelativeTime(item.attemptedAt)}</span>}
-            </p>
-            <span
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-primary to-glow transition-transform duration-300 group-hover:scale-x-100"
-              aria-hidden
-            />
-          </Link>
+              <Chevron className="h-5 w-5 shrink-0 text-muted-foreground/60 transition-colors group-hover:text-primary" />
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

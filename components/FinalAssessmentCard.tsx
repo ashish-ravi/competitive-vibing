@@ -23,29 +23,33 @@ export function FinalAssessmentCard({
   streaming,
 }: FinalAssessmentCardProps) {
   return (
-    <Card className="border-primary/40">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">After the interview</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-[22px]">After the interview</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <VerdictBadge verdict={initialVerdict} />
-          <span className="tabular-nums text-muted-foreground">{initialScore}</span>
-          <span className="text-muted-foreground" aria-hidden>
-            →
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="flex items-center gap-2">
+            <VerdictBadge verdict={initialVerdict} />
+            <span className="text-[17px] tabular-nums text-muted-foreground">{initialScore}</span>
           </span>
+          <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="became">
+            <path d="M5 12h14m-6-6 6 6-6 6" />
+          </svg>
           {finalVerdict !== undefined && finalScore !== undefined ? (
-            <>
+            <span className="flex items-center gap-2">
               <VerdictBadge verdict={finalVerdict} />
-              <span className="font-semibold tabular-nums">{finalScore}</span>
-            </>
+              <span className="text-[22px] font-semibold tabular-nums tracking-title">{finalScore}</span>
+            </span>
           ) : (
             streaming && <StreamingCursor />
           )}
         </div>
-        {deltaReason && <p className="text-sm text-muted-foreground">{deltaReason}</p>}
+        {deltaReason && (
+          <p className="text-[15px] leading-relaxed text-muted-foreground">{deltaReason}</p>
+        )}
         {commentary && (
-          <p className="text-sm leading-relaxed">
+          <p className="text-[17px] leading-relaxed">
             {commentary}
             {streaming && finalScore === undefined && <StreamingCursor />}
           </p>

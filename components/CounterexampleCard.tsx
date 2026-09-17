@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CounterexampleSteps } from '@/components/CounterexampleSteps';
+import { Notice } from '@/components/Notice';
 import { RateLimitNotice } from '@/components/RateLimitNotice';
 import { StreamingCursor } from '@/components/StreamingCursor';
 import { readNdjsonStream } from '@/lib/stream';
@@ -26,14 +27,14 @@ interface StreamedState {
 function VerifiedBadge() {
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+      className="inline-flex items-center gap-1.5 rounded-full bg-ease/[0.12] px-2.5 py-1 text-[12px] font-semibold text-ease"
       title="This counterexample passed an independent AI verification pass: the expected output was recomputed from the problem statement and your approach was re-simulated from scratch."
     >
-      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         <path d="m9 12 2 2 4-4" />
       </svg>
-      verified
+      Verified
     </span>
   );
 }
@@ -45,21 +46,18 @@ function ComparisonRow({
 }) {
   return (
     <div className="space-y-2">
-      <p className="break-words rounded-md bg-muted px-3 py-2 font-mono text-sm">{input.input}</p>
+      <div className="rounded-xl bg-secondary px-4 py-3">
+        <p className="text-[12px] font-semibold text-muted-foreground">Input</p>
+        <p className="mt-0.5 break-words font-mono text-[14px]">{input.input}</p>
+      </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <div className="rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 dark:border-emerald-900 dark:bg-emerald-950">
-          <p className="text-xs font-medium text-emerald-800 dark:text-emerald-300">
-            Correct answer
-          </p>
-          <p className="break-words font-mono text-sm text-emerald-900 dark:text-emerald-200">
-            {input.expected_output}
-          </p>
+        <div className="rounded-xl bg-ease/[0.08] px-4 py-3">
+          <p className="text-[12px] font-semibold text-ease">Correct answer</p>
+          <p className="mt-0.5 break-words font-mono text-[14px]">{input.expected_output}</p>
         </div>
-        <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 dark:border-red-900 dark:bg-red-950">
-          <p className="text-xs font-medium text-red-800 dark:text-red-300">Your approach returns</p>
-          <p className="break-words font-mono text-sm text-red-900 dark:text-red-200">
-            {input.approach_output}
-          </p>
+        <div className="rounded-xl bg-boss/[0.08] px-4 py-3">
+          <p className="text-[12px] font-semibold text-boss">Your approach returns</p>
+          <p className="mt-0.5 break-words font-mono text-[14px]">{input.approach_output}</p>
         </div>
       </div>
     </div>
@@ -146,7 +144,7 @@ export function CounterexampleCard({ evaluationId, stored }: CounterexampleCardP
         setPhase('error');
       }
     } catch {
-      setMessage('Network hiccup — please try again.');
+      setMessage('The counterexample did not load. Check your connection and try again.');
       setPhase('error');
     }
   }
@@ -154,15 +152,15 @@ export function CounterexampleCard({ evaluationId, stored }: CounterexampleCardP
   if (phase === 'idle') {
     return (
       <Card>
-        <CardContent className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between md:p-6">
           <div>
-            <p className="text-sm font-semibold">Want proof?</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[17px] font-semibold tracking-title">Want proof?</p>
+            <p className="mt-0.5 text-[15px] leading-relaxed text-muted-foreground">
               See a concrete input where your approach breaks, traced step by step.
             </p>
           </div>
           <Button onClick={run} variant="outline" className="shrink-0">
-            Show me where it breaks
+            Show where it breaks
           </Button>
         </CardContent>
       </Card>
@@ -171,13 +169,13 @@ export function CounterexampleCard({ evaluationId, stored }: CounterexampleCardP
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-base">Counterexample</CardTitle>
+      <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+        <CardTitle className="text-[22px]">Counterexample</CardTitle>
         {phase === 'complete' && <VerifiedBadge />}
       </CardHeader>
       <CardContent className="space-y-4">
         {(phase === 'generating' || phase === 'verifying') && !state.input && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-[15px] text-muted-foreground">
             {phase === 'generating'
               ? 'Constructing a failing input for your approach'
               : 'Verifying the counterexample independently'}
@@ -189,22 +187,22 @@ export function CounterexampleCard({ evaluationId, stored }: CounterexampleCardP
         <CounterexampleSteps steps={state.steps} />
 
         {state.whyItBreaks && (
-          <div className="rounded-md border-l-4 border-primary bg-muted/50 px-3 py-2 text-sm">
+          <p className="rounded-xl bg-secondary px-4 py-3 text-[15px] leading-relaxed">
             {state.whyItBreaks}
-          </div>
+          </p>
         )}
 
         {phase === 'unavailable' && message && (
-          <p className="text-sm text-muted-foreground">{message}</p>
+          <p className="text-[15px] leading-relaxed text-muted-foreground">{message}</p>
         )}
 
         {phase === 'error' && message && (
-          <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+          <Notice tone="error">
             {message}{' '}
-            <button onClick={run} className="font-semibold underline underline-offset-2">
+            <button onClick={run} className="font-semibold text-primary hover:underline">
               Try again
             </button>
-          </div>
+          </Notice>
         )}
         {retryAfter !== null && <RateLimitNotice retryAfter={retryAfter} />}
       </CardContent>

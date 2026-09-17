@@ -9,7 +9,7 @@ const VARIANT: Record<Difficulty, 'success' | 'warning' | 'destructive'> = {
 
 export function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
   return (
-    <Badge variant={VARIANT[difficulty]} className="capitalize">
+    <Badge variant={VARIANT[difficulty]} className="shrink-0 capitalize">
       {difficulty}
     </Badge>
   );

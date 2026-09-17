@@ -9,11 +9,11 @@ import { cn } from '@/lib/utils';
  */
 export function EmptyState() {
   return (
-    <div className="mx-auto max-w-lg space-y-4 py-6">
-      <div className="space-y-1 text-center">
-        <h2 className="text-lg font-semibold">No evaluations yet</h2>
-        <p className="text-sm text-muted-foreground">
-          Explain an approach to any problem and your feedback will look like this:
+    <div className="mx-auto max-w-lg space-y-6 py-6">
+      <div className="text-center">
+        <h1 className="text-[32px] font-semibold leading-tight tracking-display">No evaluations yet</h1>
+        <p className="mt-2 text-[17px] leading-relaxed text-muted-foreground">
+          Explain an approach to any problem and your feedback will look like this.
         </p>
       </div>
       <EvaluationResult
@@ -39,7 +39,7 @@ export function EmptyState() {
         }}
       />
       <div className="text-center">
-        <Link href="/" className={cn(buttonVariants())}>
+        <Link href="/" className={cn(buttonVariants({ size: 'lg' }))}>
           Pick a problem
         </Link>
       </div>

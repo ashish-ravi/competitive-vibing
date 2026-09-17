@@ -31,19 +31,19 @@ export function ExploreIcon({ className }: { className?: string }) {
   );
 }
 
-const ITEMS = [
+export const NAV_ITEMS = [
   { href: '/', label: 'Library', icon: LibraryIcon, isActive: (p: string) => p === '/' || p.startsWith('/problems') },
   { href: '/explore', label: 'Explore', icon: ExploreIcon, isActive: (p: string) => p.startsWith('/explore') },
   { href: '/leaderboard', label: 'Leaderboard', icon: LeaderboardIcon, isActive: (p: string) => p.startsWith('/leaderboard') },
 ];
 
-/** Vertical nav: quiet pills, brand-tinted active state. */
+/** Vertical nav in the macOS sidebar idiom: accent icons, neutral selection fill. */
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col gap-1" aria-label="Primary">
-      {ITEMS.map((item) => {
+    <nav className="flex flex-col gap-0.5" aria-label="Primary">
+      {NAV_ITEMS.map((item) => {
         const active = item.isActive(pathname);
         const Icon = item.icon;
         return (
@@ -53,13 +53,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'flex min-h-[44px] items-center gap-3 rounded-lg px-3.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'flex h-11 items-center gap-3 rounded-lg px-3 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               active
-                ? 'bg-primary/10 font-semibold text-primary'
-                : 'font-medium text-muted-foreground hover:bg-accent hover:text-foreground'
+                ? 'bg-black/[0.06] font-semibold text-foreground dark:bg-white/[0.1]'
+                : 'font-medium text-foreground/80 hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/[0.06]'
             )}
           >
-            <Icon className="h-[18px] w-[18px]" />
+            <Icon className="h-[19px] w-[19px] text-primary" />
             {item.label}
           </Link>
         );

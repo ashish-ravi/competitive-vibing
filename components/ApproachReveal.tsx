@@ -38,30 +38,37 @@ export function ApproachReveal({ slug }: { slug: string }) {
       }
       setState({ phase: 'loaded', approach: body.data as Approach });
     } catch {
-      setState({ phase: 'error', message: 'Network hiccup — please try again.' });
+      setState({ phase: 'error', message: 'Could not load the approach. Check your connection and try again.' });
     }
   }
 
   if (state.phase === 'loaded') {
     const a = state.approach;
     return (
-      <Card className="border-glow/40">
-        <CardHeader className="pb-2">
-          <CardTitle className="prompt-heading font-display text-base">a strong approach</CardTitle>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-[22px]">A strong approach</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <p className="leading-relaxed">{a.summary}</p>
-          <div className="rounded-md border-l-4 border-glow bg-muted/50 px-3 py-2">
-            <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-              key insight
-            </span>
-            <p className="mt-0.5 leading-relaxed">{a.key_insight}</p>
+        <CardContent className="space-y-4">
+          <p className="text-[17px] leading-relaxed">{a.summary}</p>
+          <div className="rounded-xl bg-secondary px-4 py-3">
+            <p className="text-[12px] font-semibold text-muted-foreground">Key insight</p>
+            <p className="mt-0.5 text-[15px] leading-relaxed">{a.key_insight}</p>
           </div>
-          <p className="flex flex-wrap gap-3 font-mono text-xs text-muted-foreground">
-            <span>#{a.algorithm}</span>
-            <span>time {a.time_complexity}</span>
-            <span>space {a.space_complexity}</span>
-          </p>
+          <dl className="flex flex-wrap gap-x-6 gap-y-1 text-[14px]">
+            <div className="flex gap-2">
+              <dt className="text-muted-foreground">Technique</dt>
+              <dd>{a.algorithm}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-muted-foreground">Time</dt>
+              <dd className="font-mono">{a.time_complexity}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-muted-foreground">Space</dt>
+              <dd className="font-mono">{a.space_complexity}</dd>
+            </div>
+          </dl>
         </CardContent>
       </Card>
     );
@@ -78,7 +85,7 @@ export function ApproachReveal({ slug }: { slug: string }) {
         {state.phase === 'loading' ? 'Loading…' : 'Compare with a strong approach'}
       </Button>
       {state.phase === 'error' && (
-        <p className="text-xs text-muted-foreground">{state.message}</p>
+        <p className="text-[13px] text-muted-foreground">{state.message}</p>
       )}
     </div>
   );
