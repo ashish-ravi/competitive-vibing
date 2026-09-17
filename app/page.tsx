@@ -10,28 +10,18 @@ import {
   getUserStats,
   topicLabel,
 } from '@/lib/stats';
-import { HeroTerminal } from '@/components/HeroTerminal';
+import { LandingSpecimen } from '@/components/LandingSpecimen';
 import { ProblemBrowser } from '@/components/ProblemBrowser';
 import { ProgressRail } from '@/components/ProgressRail';
 import { ResumeSection } from '@/components/ResumeSection';
-import { Reveal } from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
 
-const STEPS = [
-  {
-    title: 'Explain, don’t code',
-    body: 'Pick a classic problem and describe your approach in plain English or pseudocode — the part interviews actually grade.',
-  },
-  {
-    title: 'Get a real verdict',
-    body: 'Correctness, edge cases, complexity, clarity — scored against a rubric and streamed back in seconds.',
-  },
-  {
-    title: 'Survive the follow-ups',
-    body: 'The AI interviewer probes your gaps with follow-up questions, then re-scores you. Flawed idea? Watch it break on a verified counterexample.',
-  },
+const FACTS: { lead: string; rest: string }[] = [
+  { lead: '150 problems', rest: 'from the Blind 75 and NeetCode 150 canon, written fresh.' },
+  { lead: 'Rubric-scored', rest: 'on correctness, edge cases, complexity, and clarity.' },
+  { lead: 'Follow-up questions', rest: 'that adjust your score, the way a real interview does.' },
 ];
 
 export default async function HomePage({
@@ -43,38 +33,36 @@ export default async function HomePage({
 
   if (!session?.user) {
     return (
-      <div className="space-y-16 pb-16 pt-4 md:pt-10">
-        <section className="grid items-center gap-10 md:grid-cols-2">
-          <div className="space-y-6">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
-              interview prep for the thinking part
-            </p>
-            <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight md:text-5xl">
-              Talk your way through the interview.
+      <div className="mx-auto max-w-5xl pb-20 pt-8 md:pt-16">
+        <section className="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-center lg:gap-16">
+          <div className="max-w-2xl">
+            <h1 className="font-display text-[40px] font-bold leading-[1.1] tracking-tight md:text-[52px] md:leading-[1.06]">
+              Explain the algorithm. Get an interviewer’s verdict.
             </h1>
-            <p className="max-w-md text-muted-foreground">
-              150 classic problems. No editor, no autocomplete — just you explaining an algorithm
-              and an AI interviewer deciding if it holds up.
+            <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-muted-foreground">
+              Describe your approach in plain English. Competitive Vibing scores it for
+              correctness, edge cases, and complexity, then asks the follow-up questions a real
+              interviewer would. No code, no editor.
             </p>
-            <form action={signInAction}>
-              <Button size="lg" type="submit">
-                Sign in with Google — it’s free
+            <form action={signInAction} className="mt-8">
+              <Button size="lg" type="submit" className="w-full sm:w-auto sm:min-w-[240px]">
+                Continue with Google
               </Button>
             </form>
+            <p className="mt-3 text-[13px] text-muted-foreground">
+              Uses your Google name and photo to save your progress. Nothing else is collected.
+            </p>
           </div>
-          <HeroTerminal />
+          <LandingSpecimen />
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {STEPS.map((step, i) => (
-            <Reveal key={step.title} delay={i * 120}>
-              <div className="h-full rounded-lg border bg-card p-5">
-                <h2 className="prompt-heading font-display text-base font-bold">{step.title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
-              </div>
-            </Reveal>
+        <ul className="mt-16 grid gap-6 border-t pt-8 sm:grid-cols-3">
+          {FACTS.map((fact) => (
+            <li key={fact.lead} className="text-[15px] leading-relaxed text-muted-foreground">
+              <span className="font-semibold text-foreground">{fact.lead}</span> {fact.rest}
+            </li>
           ))}
-        </section>
+        </ul>
       </div>
     );
   }

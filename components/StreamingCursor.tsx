@@ -1,8 +1,12 @@
+/**
+ * Static "more is coming" marker shown at the end of text that is still
+ * streaming in. Deliberately not animated: blinking carets are repetitive
+ * motion that reads as decoration and is hard on motion-sensitive users.
+ */
 export function StreamingCursor() {
   return (
-    <span
-      aria-hidden
-      className="ml-0.5 inline-block h-4 w-2 animate-pulse-cursor rounded-sm bg-primary align-text-bottom"
-    />
+    <span aria-hidden className="ml-1 text-muted-foreground">
+      …
+    </span>
   );
 }

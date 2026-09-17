@@ -94,8 +94,6 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-up,
-    .animate-pulse-cursor,
-    .animate-caret,
     .animate-slide-in,
     .animate-backdrop-in,
     .animate-ping {
