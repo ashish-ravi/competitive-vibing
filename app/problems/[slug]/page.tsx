@@ -26,17 +26,23 @@ export default async function ProblemDetailPage({ params }: { params: { slug: st
   ]);
 
   return (
-    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 pb-24 md:grid-cols-2 md:gap-12 md:pb-8 lg:gap-16">
-      <div className="space-y-6">
+    // Mobile order: statement → input → hints. Desktop: statement + hints in
+    // the left column, the input spanning the right.
+    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-x-12 gap-y-10 pb-24 md:grid-cols-2 md:grid-rows-[auto_1fr] md:pb-8 lg:gap-x-16">
+      <div className="order-1">
         <ProblemStatement problem={problem} />
+      </div>
+      <div className="order-2 md:col-start-2 md:row-span-2 md:row-start-1">
+        <EvaluationSection
+          problemId={problem.id}
+          problemSlug={problem.slug}
+          priorAttempts={attempts}
+          nextProblem={nextProblem}
+        />
+      </div>
+      <div className="order-3 md:col-start-1 md:row-start-2 md:self-start">
         <HintsPanel hints={problem.hints ?? []} />
       </div>
-      <EvaluationSection
-        problemId={problem.id}
-        problemSlug={problem.slug}
-        priorAttempts={attempts}
-        nextProblem={nextProblem}
-      />
     </div>
   );
 }
