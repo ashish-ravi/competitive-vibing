@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { getLeaderboardOptIn, getUserStats } from '@/lib/stats';
 import { Chevron } from '@/components/ChevronLink';
+import { DeleteAccount } from '@/components/DeleteAccount';
 import { LeaderboardToggle } from '@/components/LeaderboardToggle';
 import { UserAvatar } from '@/components/UserAvatar';
 import { VerdictBadge } from '@/components/VerdictBadge';
@@ -202,6 +203,17 @@ export default async function ProfilePage() {
             })}
           </ul>
         )}
+      </Tile>
+
+      {/* Account */}
+      <Tile title="Account">
+        <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+          Signed in with Google as {session.user.email}. Deleting your account removes your
+          progress and every evaluation.
+        </p>
+        <div className="mt-3">
+          <DeleteAccount />
+        </div>
       </Tile>
     </div>
   );

@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { DeleteAccount } from '@/components/DeleteAccount';
 import { EmptyState } from '@/components/EmptyState';
 import { EvaluationSection } from '@/components/EvaluationSection';
 import { HintsPanel } from '@/components/HintsPanel';
@@ -121,6 +122,12 @@ export default function DevPreviewPage({
         />
         <div className="rounded-2xl bg-card p-5">
           <LeaderboardToggle optedIn={false} />
+        </div>
+        <div className="rounded-2xl bg-card p-5">
+          <h2 className="text-[22px] font-semibold tracking-title">Account</h2>
+          <div className="mt-3">
+            <DeleteAccount />
+          </div>
         </div>
         <EmptyState />
       </div>

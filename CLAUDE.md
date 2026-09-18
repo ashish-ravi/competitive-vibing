@@ -31,20 +31,26 @@ Competitive Vibing is a mobile-first web app for coding interview practice. User
 │   │   └── page.tsx            # Problem detail + hints + explanation input
 │   ├── history/
 │   │   └── page.tsx
+│   ├── explore/
+│   │   └── page.tsx            # Roadmap: topics in learning order with progress
 │   ├── profile/
-│   │   └── page.tsx            # XP, level, streak, badges, per-topic progress
+│   │   └── page.tsx            # XP, level, streak, badges, per-topic progress, account deletion
 │   ├── leaderboard/
 │   │   └── page.tsx            # Opt-in XP ranking
+│   ├── dev-preview/page.tsx    # Screenshot harness with fake data; 404 in production
 │   └── api/
 │       ├── auth/[...nextauth]/route.ts
 │       ├── problems/route.ts
 │       ├── problems/[slug]/route.ts
+│       ├── problems/[slug]/approach/route.ts  # Strong approach, only after an attempt
 │       ├── evaluate/route.ts   # Streaming Groq evaluation (+ follow-up questions)
 │       ├── history/route.ts
 │       ├── history/[id]/route.ts
 │       ├── interview/answer/route.ts    # Socratic interviewer: record answer (no AI call)
 │       ├── interview/finalize/route.ts  # Socratic interviewer: streaming final assessment
-│       └── counterexample/route.ts      # Counterexample engine: generate → verify → stream
+│       ├── counterexample/route.ts      # Counterexample engine: generate → verify → stream
+│       ├── account/route.ts             # DELETE: remove the signed-in user + cascade
+│       └── cron/keepalive/route.ts      # Daily Vercel cron; keeps free-tier Supabase awake
 ├── components/                 # Shared UI components
 ├── lib/
 │   ├── db.ts                   # Supabase client
@@ -98,15 +104,23 @@ SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 GROQ_API_KEY=
+CRON_SECRET=          # Vercel cron auth for /api/cron/keepalive
 ```
 
 ---
 
 ## Frontend Design
 
-Use the **21st.dev Magic MCP** plugin when building or refining UI components. It provides access to a library of beautiful, production-ready React + Tailwind components. Prefer components from this plugin over building from scratch when a suitable one exists — it keeps the visual quality high and reduces custom CSS.
+The UI follows Apple's Human Interface Guidelines (the `apple-design` skill, when available, holds the references). The system, defined in `app/globals.css` and `tailwind.config.ts`:
 
-To use it: invoke the `21st_magic_component_builder` tool with a description of the component you need.
+- **Surfaces:** grouped — grey page with white tiles in light, black page with graphite tiles in dark. Tiles are `rounded-2xl bg-card`, no borders. Clickable tiles use the `.tile-interactive` class (shadow lift in light; brighter surface + hairline in dark, since shadows vanish on black).
+- **Type:** system typeface. Page titles 32/40px semibold with `tracking-display`; section titles 22px; tile titles 17px; body 17px, secondary 15px, captions 13px. No lowercase headings, no `> ` prompt glyphs, no mono for UI labels (mono is for code, inputs and complexities only).
+- **Color:** one accent (`primary`, system blue) for everything interactive. `ease`/`grind`/`boss` are reserved for easy/medium/hard and correct/partial/needs work — never decorative.
+- **Controls:** pill buttons (`components/ui/button.tsx`); one prominent button per view; segmented control for filters; iOS-style switch for opt-in. Touch targets ≥ 44px.
+- **Motion:** no blinking carets, no staggered fade-ups, no parallax. Transitions are brief and hover/press only.
+- **Copy:** sentence case, plain words, every label says what happens.
+
+Verify visually with `scripts/_shots.mjs` against `/dev-preview` (phone and desktop, light and dark) before calling UI work done.
 
 ---
 
