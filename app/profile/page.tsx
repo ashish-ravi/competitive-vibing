@@ -214,6 +214,11 @@ export default async function ProfilePage() {
         <div className="mt-3">
           <DeleteAccount />
         </div>
+        <p className="mt-4 border-t border-border pt-4 text-[13px] text-muted-foreground">
+          <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+          <span aria-hidden> · </span>
+          <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
+        </p>
       </Tile>
     </div>
   );

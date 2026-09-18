@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { signInAction } from '@/app/actions';
 import { listProblems } from '@/lib/problems';
@@ -63,6 +64,15 @@ export default async function HomePage({
             </li>
           ))}
         </ul>
+
+        <footer className="mt-16 flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-muted-foreground">
+          <Link href="/privacy" className="min-h-[44px] leading-[44px] hover:text-foreground">
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="min-h-[44px] leading-[44px] hover:text-foreground">
+            Terms of Service
+          </Link>
+        </footer>
       </div>
     );
   }
