@@ -79,7 +79,7 @@ lib/                  auth, db, groq, prompts, schemas, evaluation, interview,
                       counterexample, stats (XP/streak/badges/leaderboard), roadmap
 scripts/              import-problems.ts (problem bank), _shots.mjs (Playwright screenshots)
 supabase/migrations/  schema, RLS policies, the atomic rate-limit function
-docs/                 PRD, architecture, prompts, roadmap
+docs/                 PRD, architecture, prompts, roadmap (history), backlog (what's next)
 .claude/rules/        non-negotiable engineering rules (auth, validation, streaming, mobile)
 ```
 
@@ -108,6 +108,12 @@ which is why grading, counterexample generation, and verification use three diff
   ever appears in the `user` role. Model output is constrained by JSON schema.
 - Security headers (CSP, HSTS, frame denial) are set in `next.config.mjs`.
 - Accounts can be deleted from the Profile page; deletion cascades to every evaluation.
+
+## What's next
+
+[`docs/backlog.md`](docs/backlog.md) is the live list of everything still to build — launch
+blockers, feature versions, the mobile app plan, AI-quality work and codebase cleanups, each
+with a rough effort estimate. Edit that file as work lands; `docs/roadmap.md` is history.
 
 ## Contributing
 

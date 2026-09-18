@@ -1,6 +1,9 @@
 # Roadmap — Competitive Vibing
 
-> **Status (Sept 2026):** V1 M1–M6 shipped. V2 shipped: streaks, XP, badges, 150-problem bank, hints, strong-approach reveal, opt-in leaderboard, Explore roadmap, plus two signature features not in the original plan — the Socratic interviewer and the verified counterexample engine. Remaining boxes below are open.
+> **Status (Sept 2026):** V1 M1–M6 shipped. V2 shipped: streaks, XP, badges, 150-problem bank, hints, strong-approach reveal, opt-in leaderboard, Explore roadmap, plus two signature features not in the original plan — the Socratic interviewer and the verified counterexample engine.
+>
+> **This file is the historical plan.** Everything still to build lives in
+> [`backlog.md`](backlog.md), including the unticked boxes below — don't plan from this file.
 
 ## V1 — Core Product (~6 weeks)
 
