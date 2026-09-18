@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { auth, signIn, signOut } from '@/lib/auth';
 import { setLeaderboardOptIn } from '@/lib/stats';
 
@@ -16,6 +16,7 @@ export async function toggleLeaderboardAction(optIn: boolean) {
   const session = await auth();
   if (!session?.user?.id) return;
   await setLeaderboardOptIn(session.user.id, optIn);
+  revalidateTag('leaderboard');
   revalidatePath('/leaderboard');
   revalidatePath('/profile');
 }

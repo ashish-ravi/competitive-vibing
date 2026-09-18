@@ -1,4 +1,7 @@
-import { getServiceDb, type Difficulty, type Verdict } from '@/lib/db';
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+import { getServiceDb, type Difficulty, type ProblemListItem, type Verdict } from '@/lib/db';
+import { listAllProblems } from '@/lib/problems';
 
 // ---------------------------------------------------------------------------
 // Topic display names
@@ -79,7 +82,12 @@ interface EvalFact {
   problem: { slug: string; title: string; difficulty: Difficulty; topics: string[] } | null;
 }
 
-async function fetchEvalFacts(userId: string): Promise<EvalFact[]> {
+/**
+ * Every evaluation for a user, newest first. Wrapped in React `cache`: the
+ * dashboard derives statuses, stats, resume items and solve days from the
+ * same rows, so one request runs this query once instead of four times.
+ */
+const fetchEvalFacts = cache(async (userId: string): Promise<EvalFact[]> => {
   const db = getServiceDb();
   const { data, error } = await db
     .from('evaluations')
@@ -90,7 +98,7 @@ async function fetchEvalFacts(userId: string): Promise<EvalFact[]> {
     .order('created_at', { ascending: false });
   if (error) throw new Error(`Failed to fetch evaluations: ${error.message}`);
   return (data ?? []) as unknown as EvalFact[];
-}
+});
 
 // ---------------------------------------------------------------------------
 // Problem statuses for the browse table
@@ -216,13 +224,7 @@ export interface UserStats {
 }
 
 export async function getUserStats(userId: string): Promise<UserStats> {
-  const db = getServiceDb();
-  const [facts, problemsRes] = await Promise.all([
-    fetchEvalFacts(userId),
-    db.from('problems').select('id, difficulty, topics'),
-  ]);
-  if (problemsRes.error) throw new Error(`Failed to fetch problems: ${problemsRes.error.message}`);
-  const problems = (problemsRes.data ?? []) as { id: string; difficulty: Difficulty; topics: string[] }[];
+  const [facts, problems] = await Promise.all([fetchEvalFacts(userId), listAllProblems()]);
 
   // Per-problem best outcome
   const best = new Map<string, { solved: boolean; fact: EvalFact }>();
@@ -327,26 +329,10 @@ export async function getSolveDays(userId: string): Promise<string[]> {
 // Continue / next-problem flow
 // ---------------------------------------------------------------------------
 
-interface ProblemLite {
-  id: string;
-  slug: string;
-  title: string;
-  difficulty: Difficulty;
-  topics: string[];
-}
+type ProblemLite = Pick<ProblemListItem, 'id' | 'slug' | 'title' | 'difficulty' | 'topics'>;
 
-const DIFFICULTY_RANK: Record<Difficulty, number> = { easy: 0, medium: 1, hard: 2 };
-
-function canonicalOrder(a: ProblemLite, b: ProblemLite): number {
-  return DIFFICULTY_RANK[a.difficulty] - DIFFICULTY_RANK[b.difficulty] || a.title.localeCompare(b.title);
-}
-
-async function fetchProblemsLite(): Promise<ProblemLite[]> {
-  const db = getServiceDb();
-  const { data, error } = await db.from('problems').select('id, slug, title, difficulty, topics');
-  if (error) throw new Error(`Failed to fetch problems: ${error.message}`);
-  return ((data ?? []) as ProblemLite[]).sort(canonicalOrder);
-}
+/** Canonical-order bank, shared per request via the cached list. */
+const fetchProblemsLite = listAllProblems;
 
 function sharesTopic(a: ProblemLite, b: ProblemLite): boolean {
   return a.topics.some((t) => b.topics.includes(t));
@@ -468,7 +454,17 @@ export interface LeaderboardRow {
   rank: number;
 }
 
-export async function getLeaderboard(limit = 50): Promise<LeaderboardRow[]> {
+/**
+ * Ranking is global and read on every dashboard load, but it aggregates every
+ * evaluation of every opted-in user. Cached for a minute across requests;
+ * opting in or out busts the tag so the change shows immediately.
+ */
+export const getLeaderboard = unstable_cache(computeLeaderboard, ['leaderboard'], {
+  revalidate: 60,
+  tags: ['leaderboard'],
+});
+
+async function computeLeaderboard(limit = 50): Promise<LeaderboardRow[]> {
   const db = getServiceDb();
   const { data: users, error } = await db
     .from('users')
