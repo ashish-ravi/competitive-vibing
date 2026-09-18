@@ -111,9 +111,11 @@ which is why grading, counterexample generation, and verification use three diff
 
 ## What's next
 
-[`docs/backlog.md`](docs/backlog.md) is the live list of everything still to build — launch
-blockers, feature versions, the mobile app plan, AI-quality work and codebase cleanups, each
-with a rough effort estimate. Edit that file as work lands; `docs/roadmap.md` is history.
+- [`docs/priorities.md`](docs/priorities.md) — **start here.** Every outstanding item ranked
+  into one ordered sequence, with the reasoning and a two-week plan.
+- [`docs/backlog.md`](docs/backlog.md) — the full catalogue, grouped by version: launch
+  blockers, feature versions, the mobile app plan, AI-quality work, codebase cleanups.
+- [`docs/roadmap.md`](docs/roadmap.md) — history; what shipped and when.
 
 ## Contributing
 

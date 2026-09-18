@@ -1,8 +1,11 @@
 # Backlog — future versions
 
-Everything not yet built, in rough priority order. `roadmap.md` is the historical plan and
-records what shipped; this file is the forward-looking list and is the one to edit as work
-lands. Open items from `roadmap.md` V1.1/V2 have been folded in here.
+Everything not yet built, grouped by version. `roadmap.md` is the historical plan and records
+what shipped; this file is the forward-looking list and is the one to edit as work lands.
+Open items from `roadmap.md` V1.1/V2 have been folded in here.
+
+**For what to do next, read [`priorities.md`](priorities.md)** — it ranks every item below
+into one ordered sequence. This file is the catalogue; that one is the plan.
 
 Effort estimates assume one person who already knows the codebase.
 
